@@ -8,9 +8,9 @@ public class SuspicionMeter : MonoBehaviour
     [SerializeField]
     private Sprite[] meterSprites;
 
-    private EnemySuspicion es;
+    public EnemySuspicion es;
 
-    private Image img;
+    public Image img;
 
     // Start is called before the first frame update
     void Start()
@@ -22,7 +22,10 @@ public class SuspicionMeter : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        int index = Mathf.Min((int)(es.GetPercentageDetected() * meterSprites.Length), meterSprites.Length - 1);
+        int index = Mathf.Min(
+            (int)(es.GetPercentageDetected() * meterSprites.Length),
+            meterSprites.Length - 1
+        );
 
         img.sprite = meterSprites[index];
     }

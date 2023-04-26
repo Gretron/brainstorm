@@ -54,6 +54,16 @@ public class EnemySuspicion : MonoBehaviour
     private float detectedThreshold = 1;
 
     /// <summary>
+    /// Terminal Counter
+    /// </summary>
+    private float terminalCounter;
+
+    /// <summary>
+    /// Terminal Complete Value
+    /// </summary>
+    private float terminalComplete = 2;
+
+    /// <summary>
     /// Enum to Determine Suspicion
     /// </summary>
     private Suspicion suspicion = Suspicion.None;
@@ -83,6 +93,9 @@ public class EnemySuspicion : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
 
         agent.autoBraking = true;
+
+        // Subscribe to Terminal Alert Event
+        GameManager.Instance.TerminalAlertEvent.AddListener(TerminalAlertHandler);
     }
 
     /// <summary>
@@ -91,8 +104,25 @@ public class EnemySuspicion : MonoBehaviour
     void Update()
     {
         // If Alerted...
-        if (suspicion == Suspicion.Alerted) {
-            return;
+        if (suspicion == Suspicion.Alerted)
+        {
+            // If At Terminal...
+            if (!agent.pathPending && agent.remainingDistance < 0.5f)
+            {
+                // If Terminal Counter Completed...
+                if (terminalCounter >= terminalComplete)
+                {
+                    GameManager.Instance.TerminalAlertEvent.Invoke();
+                }
+
+                terminalCounter += Time.deltaTime;
+
+                return;
+            }
+            else
+            {
+                return;
+            }
         }
 
         // If Player Is Detected...
@@ -104,7 +134,8 @@ public class EnemySuspicion : MonoBehaviour
 
             detectedCounter = Mathf.Min(detectedCounter + Time.deltaTime, detectedThreshold);
 
-            if (detectedCounter >= detectedThreshold) {
+            if (detectedCounter >= detectedThreshold)
+            {
                 suspicion = Suspicion.Alerted;
                 agent.destination = FindClosestTerminal().transform.position;
             }
@@ -214,7 +245,23 @@ public class EnemySuspicion : MonoBehaviour
     /// Get Detected Percentage
     /// </summary>
     /// <returns> Value from 0 to 1 </returns>
-    public float GetPercentageDetected() {
+    public float GetPercentageDetected()
+    {
         return detectedCounter / detectedThreshold;
+    }
+
+    /// <summary>
+    /// Handle Terminal Alert Event
+    /// </summary>
+    public void TerminalAlertHandler()
+    {
+        // Set Suspiciton to Alerted
+        suspicion = Suspicion.Alerted;
+
+        // Max Detected Counter
+        detectedCounter = detectedThreshold;
+
+        // Set Destination to Player
+        agent.destination = player.transform.position;
     }
 }
