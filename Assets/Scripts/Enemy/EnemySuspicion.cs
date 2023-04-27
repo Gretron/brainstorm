@@ -68,9 +68,6 @@ public class EnemySuspicion : MonoBehaviour
     /// </summary>
     private Suspicion suspicion = Suspicion.None;
 
-    // [SerializeField] private float timer = 1.0f;
-    // [SerializeField] private float visionCheckRate = 1.0f;
-
     [Header("Patrol Values")]
     /// <summary>
     /// Points to Patrol At

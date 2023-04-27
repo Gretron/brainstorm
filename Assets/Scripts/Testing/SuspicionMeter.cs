@@ -8,9 +8,9 @@ public class SuspicionMeter : MonoBehaviour
     [SerializeField]
     private Sprite[] meterSprites;
 
-    public EnemySuspicion es;
+    private EnemySuspicion es;
 
-    public Image img;
+    private Image img;
 
     // Start is called before the first frame update
     void Start()
@@ -28,5 +28,7 @@ public class SuspicionMeter : MonoBehaviour
         );
 
         img.sprite = meterSprites[index];
+
+        transform.parent.transform.LookAt(Camera.main.transform);
     }
 }
