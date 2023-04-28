@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2754eaec77cb79c4f81e041eb7a204e0, type: 3}
+  m_Name: detectedFrames
+  m_EditorClassIdentifier: 
+  frames:
+  - {fileID: -213134558555321427, guid: 22e7d0e83cb5b5d459031098b14bc1b2, type: 3}
+  - {fileID: 216992579856520099, guid: 22e7d0e83cb5b5d459031098b14bc1b2, type: 3}
+  - {fileID: -8732869370173541789, guid: 22e7d0e83cb5b5d459031098b14bc1b2, type: 3}
+  - {fileID: -4019129262726738698, guid: 22e7d0e83cb5b5d459031098b14bc1b2, type: 3}
+  - {fileID: 1133459458440060287, guid: 22e7d0e83cb5b5d459031098b14bc1b2, type: 3}

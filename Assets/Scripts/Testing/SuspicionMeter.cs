@@ -3,31 +3,47 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SuspicionMeter : MonoBehaviour
+public class SuspicionMeter : AnimatableImage
 {
     [SerializeField]
-    private Sprite[] meterSprites;
+    private SpriteFrames spottedAnimation;
+
+    [SerializeField]
+    private SpriteFrames detectedAnimation;
+
+    [SerializeField]
+    private SpriteFrames alertedAnimation;
 
     private EnemySuspicion es;
 
-    private Image img;
+    // private Image img;
 
-    // Start is called before the first frame update
+    /// <summary>
+    /// Called Before First Frame Update
+    /// </summary>
     void Start()
     {
+        base.Start();
+
         es = GetComponentInParent<EnemySuspicion>();
-        img = GetComponent<Image>();
+        // img = GetComponent<Image>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        int index = Mathf.Min(
-            (int)(es.GetPercentageDetected() * meterSprites.Length),
-            meterSprites.Length - 1
-        );
-
-        img.sprite = meterSprites[index];
+        if (es.suspicion == Suspicion.Alerted)
+        {
+            Play(alertedAnimation, 0, 1);
+        }
+        else if (es.suspicion == Suspicion.Curious)
+        {
+            Play(detectedAnimation, es.DetectedCounter, es.DetectedThreshold);
+        }
+        else
+        {
+            Play(spottedAnimation, es.SpottedCounter, es.SpottedThreshold);
+        }
 
         transform.parent.transform.LookAt(Camera.main.transform);
     }

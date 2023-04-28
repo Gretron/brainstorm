@@ -66,7 +66,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 8949448001588976788, guid: a31c961cfebcddc4692f68c6ed8070f8, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -88,21 +88,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc91704a03ca73740825a3762757c49e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  meterSprites:
-  - {fileID: 8949448001588976788, guid: a31c961cfebcddc4692f68c6ed8070f8, type: 3}
-  - {fileID: -6618215909156479438, guid: a31c961cfebcddc4692f68c6ed8070f8, type: 3}
-  - {fileID: -1293757364243662129, guid: a31c961cfebcddc4692f68c6ed8070f8, type: 3}
-  - {fileID: 1280219813526924340, guid: a31c961cfebcddc4692f68c6ed8070f8, type: 3}
-  - {fileID: 7481480757943118375, guid: a31c961cfebcddc4692f68c6ed8070f8, type: 3}
-  - {fileID: 4382431347897597349, guid: a31c961cfebcddc4692f68c6ed8070f8, type: 3}
-  - {fileID: 6869942893100143756, guid: a31c961cfebcddc4692f68c6ed8070f8, type: 3}
-  - {fileID: 1224315479728627431, guid: a31c961cfebcddc4692f68c6ed8070f8, type: 3}
-  - {fileID: 8758787029548097150, guid: a31c961cfebcddc4692f68c6ed8070f8, type: 3}
-  - {fileID: -4232659941128495271, guid: a31c961cfebcddc4692f68c6ed8070f8, type: 3}
-  - {fileID: 1842553318542493240, guid: a31c961cfebcddc4692f68c6ed8070f8, type: 3}
-  - {fileID: -4956177784400260793, guid: a31c961cfebcddc4692f68c6ed8070f8, type: 3}
-  - {fileID: -3590433286649827168, guid: a31c961cfebcddc4692f68c6ed8070f8, type: 3}
-  - {fileID: 8752303924021942193, guid: a31c961cfebcddc4692f68c6ed8070f8, type: 3}
+  spottedAnimation: {fileID: 11400000, guid: 4c4855f25c8d954439456a1ab2aaea33, type: 2}
+  detectedAnimation: {fileID: 11400000, guid: 065a97a7346954942b050bd30e9ee5f8, type: 2}
+  alertedAnimation: {fileID: 11400000, guid: b891610770a85e24a8bccdbba310af87, type: 2}
 --- !u!1 &6226845806880977454
 GameObject:
   m_ObjectHideFlags: 0
@@ -121,7 +109,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6226845806880977449
 Transform:
   m_ObjectHideFlags: 0
@@ -212,7 +200,7 @@ GameObject:
   - component: {fileID: 6226845806965860341}
   - component: {fileID: 6226845806965860336}
   - component: {fileID: 6226845806965860339}
-  - component: {fileID: 6226845806965860337}
+  - component: {fileID: 3400834490328767045}
   m_Layer: 0
   m_Name: TestEnemy
   m_TagString: Untagged
@@ -383,7 +371,7 @@ Light:
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
---- !u!114 &6226845806965860337
+--- !u!114 &3400834490328767045
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -392,19 +380,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 6226845806965860346}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 714bb105ac5c26c41ac0c72cb9fa51e6, type: 3}
+  m_Script: {fileID: 11500000, guid: 0429508268bc64443a08dd30c3d18b27, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 0}
   maxAngle: 45
   maxDistance: 10
-  points:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  suspicion: 0
+  points: []
 --- !u!1 &6226845808088296074
 GameObject:
   m_ObjectHideFlags: 0
