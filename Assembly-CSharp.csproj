@@ -38,10 +38,11 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\Testing\SuspicionMeter.cs" />
      <Compile Include="Assets\Scripts\GameManager.cs" />
-     <Compile Include="Assets\Scripts\Enemy\EnemySuspicion.cs" />
-     <Compile Include="Assets\Scripts\Testing\PlayerMovement.cs" />
      <Compile Include="Assets\Animations\Sprite\SpriteFrames.cs" />
+     <Compile Include="Assets\Scripts\Enemy\EnemySuspicion.cs" />
      <Compile Include="Assets\Scripts\Testing\Animatable.cs" />
+     <Compile Include="Assets\Scripts\Testing\PlayerMovement.cs" />
+     <Compile Include="Assets\Scripts\Enemy\EnemyType.cs" />
     <Reference Include="UnityEngine">
         <HintPath>C:\Program Files\Unity\Hub\Editor\2020.3.46f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
     </Reference>

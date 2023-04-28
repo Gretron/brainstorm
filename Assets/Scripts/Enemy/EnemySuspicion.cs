@@ -130,9 +130,25 @@ public class EnemySuspicion : MonoBehaviour
     private IEnumerator curiousCooldownCoroutine;
 
     /// <summary>
-    /// Boolean for If Player Is Visible or Not
+    /// If Player Is Visible or Not
     /// </summary>
     private bool playerVisible = false;
+
+    /// <summary>
+    /// Is Going to Terminal Or Not
+    /// </summary>
+    private bool goingToTerminal = false;
+
+    /// <summary>
+    /// Is Enemy Keycard Holder
+    /// </summary>
+    public bool keycardHolder = false;
+
+    /// <summary>
+    /// Type of Enemy
+    /// </summary>
+    [SerializeField]
+    private EnemyType type;
 
     /// <summary>
     /// Called Before First Frame Update
@@ -166,23 +182,33 @@ public class EnemySuspicion : MonoBehaviour
         // If Suspicion Is Alerted...
         if (suspicion == Suspicion.Alerted)
         {
-            // If At Terminal...
-            if (!agent.pathPending && agent.remainingDistance < 0.5f)
+            /*
+            if (PlayerVisible())
             {
-                // If Terminal Counter Completed...
-                if (terminalCounter >= terminalComplete)
+                if (type == EnemyType.Guard)
                 {
-                    GameManager.Instance.TerminalAlertEvent.Invoke(lastPlayerPosition);
+                    agent.destination = player.transform.position;
                 }
-
-                terminalCounter += Time.deltaTime;
-
-                return;
             }
-            else
+            else { }
+
+            if (type == EnemyType.Scientist)
             {
-                return;
+                // If At Terminal...
+                if (!agent.pathPending && agent.remainingDistance < 0.5f)
+                {
+                    // If Terminal Counter Completed...
+                    if (terminalCounter >= terminalComplete)
+                    {
+                        GameManager.Instance.TerminalAlertEvent.Invoke(lastPlayerPosition);
+                    }
+
+                    terminalCounter += Time.deltaTime;
+
+                    return;
+                }
             }
+            */
         }
         // If Suspicion Is Curious...
         else if (suspicion == Suspicion.Curious)
@@ -196,8 +222,13 @@ public class EnemySuspicion : MonoBehaviour
                 if (IncrementCounter(ref detectedCounter, DetectedThreshold, Time.deltaTime))
                 {
                     suspicion = Suspicion.Alerted;
-                    agent.destination = FindClosestTerminal().transform.position;
-                    lastPlayerPosition = player.transform.position;
+
+                    // If Enemy Is Scientist
+                    if (type == EnemyType.Scientist)
+                    {
+                        agent.destination = FindClosestTerminal().transform.position;
+                        lastPlayerPosition = player.transform.position;
+                    }
                 }
 
                 // Reset Curious Cooldown
