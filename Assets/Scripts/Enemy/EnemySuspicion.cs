@@ -5,6 +5,15 @@ using UnityEngine;
 using UnityEngine.AI;
 
 /// <summary>
+/// Enemy Type Enum
+/// </summary>
+public enum EnemyType
+{
+    Scientist = 0,
+    Guard = 1,
+}
+
+/// <summary>
 /// Enemy Suspicion States
 /// </summary>
 public enum Suspicion
@@ -93,6 +102,12 @@ public class EnemySuspicion : MonoBehaviour
     private float terminalComplete = 2;
 
     /// <summary>
+    /// Type of Enemy
+    /// </summary>
+    [SerializeField]
+    private EnemyType enemyType = EnemyType.Scientist;
+
+    /// <summary>
     /// Enum to Determine Suspicion
     /// </summary>
     public Suspicion suspicion = Suspicion.Patrol;
@@ -115,21 +130,6 @@ public class EnemySuspicion : MonoBehaviour
     private int currentPatrolPoint = 0;
 
     /// <summary>
-    /// Coroutine to Resume Patrolling
-    /// </summary>
-    private IEnumerator resumePatrolCoroutine;
-
-    /// <summary>
-    /// Coroutine to Go to Last Known Player Location
-    /// </summary>
-    private IEnumerator playerLastLocationCoroutine;
-
-    /// <summary>
-    /// Coroutine to Countdown to Being Not Curious
-    /// </summary>
-    private IEnumerator curiousCooldownCoroutine;
-
-    /// <summary>
     /// If Player Is Visible or Not
     /// </summary>
     private bool playerVisible = false;
@@ -140,15 +140,19 @@ public class EnemySuspicion : MonoBehaviour
     private bool goingToTerminal = false;
 
     /// <summary>
+    /// Is Alarm Activated or Not
+    /// </summary>
+    private bool alarmActivated = false;
+
+    /// <summary>
     /// Is Enemy Keycard Holder
     /// </summary>
     public bool keycardHolder = false;
 
     /// <summary>
-    /// Type of Enemy
+    /// Is Enemy Going to Exit
     /// </summary>
-    [SerializeField]
-    private EnemyType type;
+    private bool goingToExit = false;
 
     /// <summary>
     /// Called Before First Frame Update
@@ -182,38 +186,117 @@ public class EnemySuspicion : MonoBehaviour
         // If Suspicion Is Alerted...
         if (suspicion == Suspicion.Alerted)
         {
-            /*
-            if (PlayerVisible())
+            // If Enemy Is Scientist
+            if (enemyType == EnemyType.Scientist)
             {
-                if (type == EnemyType.Guard)
+                // If Alarm Is Activated...
+                if (!alarmActivated)
+                {
+                    // If At Terminal...
+                    if (!agent.pathPending && agent.remainingDistance < 0.5f)
+                    {
+                        // If Terminal Counter Completed...
+                        if (terminalCounter >= terminalComplete)
+                        {
+                            GameManager.Instance.TerminalAlertEvent.Invoke(lastPlayerPosition);
+                        }
+
+                        terminalCounter += Time.deltaTime;
+
+                        return;
+                    }
+                }
+                // Else Alarm Isn't Activated...
+                else
+                {
+                    // If Keycard Holder...
+                    if (keycardHolder)
+                    {
+                        // If Enemy Is Going to Exit...
+                        if (goingToExit)
+                        {
+                            // If At Exit...
+                            if (!agent.pathPending && agent.remainingDistance < 0.5f)
+                            {
+                                // TODO: Losing Behaviour
+                                Debug.Log("You Lost...");
+                            }
+                        }
+                        // Else Enemy Isn't Going to Exit...
+                        else
+                        {
+                            // Going to Exit
+                            agent.destination = FindClosestExit().transform.position;
+                            goingToExit = true;
+                        }
+                    }
+                    // Else Not Keycard Holder...
+                    else
+                    {
+                        // Stop Moving
+                        agent.isStopped = true;
+                    }
+                }
+            }
+            // Else If Enemy Is Guard...
+            else if (enemyType == EnemyType.Guard)
+            {
+                // If Player Is visible
+                if (playerVisible)
                 {
                     agent.destination = player.transform.position;
-                }
-            }
-            else { }
+                    goingToTerminal = false;
 
-            if (type == EnemyType.Scientist)
-            {
-                // If At Terminal...
-                if (!agent.pathPending && agent.remainingDistance < 0.5f)
-                {
-                    // If Terminal Counter Completed...
-                    if (terminalCounter >= terminalComplete)
+                    if (goTerminalCountdown != null)
                     {
-                        GameManager.Instance.TerminalAlertEvent.Invoke(lastPlayerPosition);
+                        StopCoroutine(goTerminalCountdown);
+                        goTerminalCountdown = null;
                     }
+                }
+                // Else Player Is Not Visible...
+                else
+                {
+                    // If Current Going to Terminal....
+                    if (goingToTerminal)
+                    {
+                        // If At Terminal...
+                        if (!agent.pathPending && agent.remainingDistance < 0.5f)
+                        {
+                            // If Terminal Counter Completed...
+                            if (terminalCounter >= terminalComplete)
+                            {
+                                GameManager.Instance.TerminalAlertEvent.Invoke(lastPlayerPosition);
+                            }
 
-                    terminalCounter += Time.deltaTime;
+                            terminalCounter += Time.deltaTime;
 
-                    return;
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        // If Not Going to Terminal And Alarm Isn't Activate...
+                        if (goTerminalCountdown == null && !alarmActivated)
+                        {
+                            // Start Countdown to Go to Terminal
+                            goTerminalCountdown = GoTerminalCountdown(5);
+                            StartCoroutine(goTerminalCountdown);
+                        }
+
+                        // If At Destination...
+                        if (!agent.pathPending && agent.remainingDistance < 0.5f)
+                        {
+                            // Patrol Next Point
+                            PatrolNextPoint();
+                        }
+                    }
                 }
             }
-            */
         }
         // If Suspicion Is Curious...
         else if (suspicion == Suspicion.Curious)
         {
-            // If Player Is Detected...
+            // If Player Is Visible...
             if (PlayerVisible())
             {
                 agent.isStopped = false;
@@ -222,9 +305,10 @@ public class EnemySuspicion : MonoBehaviour
                 if (IncrementCounter(ref detectedCounter, DetectedThreshold, Time.deltaTime))
                 {
                     suspicion = Suspicion.Alerted;
+                    agent.speed = 5;
 
                     // If Enemy Is Scientist
-                    if (type == EnemyType.Scientist)
+                    if (enemyType == EnemyType.Scientist)
                     {
                         agent.destination = FindClosestTerminal().transform.position;
                         lastPlayerPosition = player.transform.position;
@@ -232,10 +316,10 @@ public class EnemySuspicion : MonoBehaviour
                 }
 
                 // Reset Curious Cooldown
-                if (curiousCooldownCoroutine != null)
+                if (curiousCountdownCoroutine != null)
                 {
-                    StopCoroutine(curiousCooldownCoroutine);
-                    curiousCooldownCoroutine = null;
+                    StopCoroutine(curiousCountdownCoroutine);
+                    curiousCountdownCoroutine = null;
                 }
 
                 // Stop Looking Last Player Location Check
@@ -245,6 +329,7 @@ public class EnemySuspicion : MonoBehaviour
                     playerLastLocationCoroutine = null;
                 }
             }
+            // If Player Isn't Visible...
             else
             {
                 // If Not Going to Look for Last Location...
@@ -263,10 +348,10 @@ public class EnemySuspicion : MonoBehaviour
 
                 IncrementCounter(ref detectedCounter, DetectedThreshold, -Time.deltaTime);
 
-                if (curiousCooldownCoroutine == null)
+                if (curiousCountdownCoroutine == null)
                 {
-                    curiousCooldownCoroutine = CuriousCooldown(5);
-                    StartCoroutine(curiousCooldownCoroutine);
+                    curiousCountdownCoroutine = CuriousCountdown(5);
+                    StartCoroutine(curiousCountdownCoroutine);
                 }
             }
         }
@@ -403,6 +488,36 @@ public class EnemySuspicion : MonoBehaviour
         return closest;
     }
 
+    /// <summary>
+    /// Find Exit Closest to Enemy
+    /// </summary>
+    /// <returns> Closest Exit </returns>
+    GameObject FindClosestExit()
+    {
+        // Find All Terminal GameObjects in Scene
+        GameObject[] gos = GameObject.FindGameObjectsWithTag("Exit");
+
+        float previousDistance = Mathf.Infinity;
+        Vector3 position = transform.position;
+
+        GameObject closest = null;
+
+        foreach (GameObject go in gos)
+        {
+            Vector3 diff = go.transform.position - position;
+            float currentDistance = diff.sqrMagnitude;
+
+            // If Current Distance Is Smaller Than Previous Distance...
+            if (currentDistance < previousDistance)
+            {
+                closest = go;
+                previousDistance = currentDistance;
+            }
+        }
+
+        return closest;
+    }
+
     #endregion
 
     #region Event Handlers
@@ -418,13 +533,30 @@ public class EnemySuspicion : MonoBehaviour
         // Max Detected Counter
         SpottedCounter = SpottedThreshold;
 
-        // Set Destination to Player
-        agent.destination = position;
+        // Start and Speed Up
+        agent.isStopped = false;
+        agent.speed = 5;
+
+        // Stop Going to Terminal Since Alarm Is On
+        goingToTerminal = false;
+        alarmActivated = true;
+
+        // If Enemy Is A Guard...
+        if (enemyType == EnemyType.Guard)
+        {
+            // Set Destination to Player
+            agent.destination = position;
+        }
     }
 
     #endregion
 
     #region Coroutines
+
+    /// <summary>
+    /// Coroutine to Resume Patrolling
+    /// </summary>
+    private IEnumerator resumePatrolCoroutine;
 
     /// <summary>
     /// Coroutine to Resume Patrolling After Delay
@@ -442,6 +574,11 @@ public class EnemySuspicion : MonoBehaviour
 
         yield return null;
     }
+
+    /// <summary>
+    /// Coroutine to Go to Last Known Player Location
+    /// </summary>
+    private IEnumerator playerLastLocationCoroutine;
 
     /// <summary>
     /// Coroutine to Go to Last Player Location After Delay
@@ -464,10 +601,15 @@ public class EnemySuspicion : MonoBehaviour
     }
 
     /// <summary>
+    /// Coroutine to Countdown to Being Not Curious
+    /// </summary>
+    private IEnumerator curiousCountdownCoroutine;
+
+    /// <summary>
     /// Coroutine for Curiousity Cooldown After Delay
     /// </summary>
     /// <param name="delay"> Delay in Seconds </param>
-    IEnumerator CuriousCooldown(float delay)
+    IEnumerator CuriousCountdown(float delay)
     {
         // Apply Delay
         yield return new WaitForSeconds(delay);
@@ -478,6 +620,25 @@ public class EnemySuspicion : MonoBehaviour
             suspicion = Suspicion.Patrol;
 
         yield return null;
+    }
+
+    /// <summary>
+    /// Coroutine to Countdown to Go to Terminal
+    /// </summary>
+    private IEnumerator goTerminalCountdown;
+
+    /// <summary>
+    /// Couroutine to Go to Terminal After Delay
+    /// </summary>
+    /// <param name="delay"> Delay Before Going to Terminal </param>
+    IEnumerator GoTerminalCountdown(float delay)
+    {
+        // Apply Delay
+        yield return new WaitForSeconds(delay);
+
+        // Go to Terminal
+        agent.destination = FindClosestTerminal().transform.position;
+        goingToTerminal = true;
     }
 
     #endregion

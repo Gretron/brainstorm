@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Terminal
   - PatrolPoint
+  - Exit
   layers:
   - Default
   - TransparentFX

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2754eaec77cb79c4f81e041eb7a204e0, type: 3}
-  m_Name: detectedFrames
+  m_Name: DetectedFrames
   m_EditorClassIdentifier: 
   frames:
   - {fileID: -213134558555321427, guid: 22e7d0e83cb5b5d459031098b14bc1b2, type: 3}
