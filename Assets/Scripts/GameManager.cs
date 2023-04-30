@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public static GameManager Instance { get; private set; }
 
-    public UnityEvent TerminalAlertEvent;
+    public UnityEvent<Vector3> TerminalAlertEvent;
 
     /// <summary>
     /// Called When Script Instance Is Loaded
@@ -29,7 +29,7 @@ public class GameManager : MonoBehaviour
             // If Terminal Alert Event Is Null...
             if (TerminalAlertEvent == null)
             {
-                TerminalAlertEvent = new UnityEvent();
+                TerminalAlertEvent = new UnityEvent<Vector3>();
             }
         }
         else

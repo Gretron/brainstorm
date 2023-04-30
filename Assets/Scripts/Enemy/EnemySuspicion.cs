@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -8,7 +9,7 @@ using UnityEngine.AI;
 /// </summary>
 public enum Suspicion
 {
-    None = 0, // Patrol
+    Patrol = 0, // Patrol
     Curious = 1, // Player Glimpse
     Alerted = 2 // Player Seen
 }
@@ -46,12 +47,40 @@ public class EnemySuspicion : MonoBehaviour
     /// <summary>
     /// Counter to Track Detection Progress
     /// </summary>
-    private float detectedCounter;
+    private float spottedCounter = 0;
+
+    /// <summary>
+    /// Counter to Track Detection Progress
+    /// </summary>
+    public float SpottedCounter
+    {
+        get { return spottedCounter; }
+        private set { spottedCounter = value; }
+    }
 
     /// <summary>
     /// Threshold for Detection
     /// </summary>
-    private float detectedThreshold = 1;
+    public float SpottedThreshold { get; private set; } = 3;
+
+    /// <summary>
+    /// Counter to Track Detection Progress
+    /// </summary>
+    private float detectedCounter = 0;
+
+    /// <summary>
+    /// Counter to Track Detection Progress
+    /// </summary>
+    public float DetectedCounter
+    {
+        get { return detectedCounter; }
+        private set { detectedCounter = value; }
+    }
+
+    /// <summary>
+    /// Threshold for Detection
+    /// </summary>
+    public float DetectedThreshold { get; private set; } = 3;
 
     /// <summary>
     /// Terminal Counter
@@ -66,10 +95,12 @@ public class EnemySuspicion : MonoBehaviour
     /// <summary>
     /// Enum to Determine Suspicion
     /// </summary>
-    private Suspicion suspicion = Suspicion.None;
+    public Suspicion suspicion = Suspicion.Patrol;
 
-    // [SerializeField] private float timer = 1.0f;
-    // [SerializeField] private float visionCheckRate = 1.0f;
+    /// <summary>
+    /// Last Position of Player
+    /// </summary>
+    private Vector3 lastPlayerPosition;
 
     [Header("Patrol Values")]
     /// <summary>
@@ -84,6 +115,42 @@ public class EnemySuspicion : MonoBehaviour
     private int currentPatrolPoint = 0;
 
     /// <summary>
+    /// Coroutine to Resume Patrolling
+    /// </summary>
+    private IEnumerator resumePatrolCoroutine;
+
+    /// <summary>
+    /// Coroutine to Go to Last Known Player Location
+    /// </summary>
+    private IEnumerator playerLastLocationCoroutine;
+
+    /// <summary>
+    /// Coroutine to Countdown to Being Not Curious
+    /// </summary>
+    private IEnumerator curiousCooldownCoroutine;
+
+    /// <summary>
+    /// If Player Is Visible or Not
+    /// </summary>
+    private bool playerVisible = false;
+
+    /// <summary>
+    /// Is Going to Terminal Or Not
+    /// </summary>
+    private bool goingToTerminal = false;
+
+    /// <summary>
+    /// Is Enemy Keycard Holder
+    /// </summary>
+    public bool keycardHolder = false;
+
+    /// <summary>
+    /// Type of Enemy
+    /// </summary>
+    [SerializeField]
+    private EnemyType type;
+
+    /// <summary>
     /// Called Before First Frame Update
     /// </summary>
     void Start()
@@ -96,6 +163,12 @@ public class EnemySuspicion : MonoBehaviour
 
         // Subscribe to Terminal Alert Event
         GameManager.Instance.TerminalAlertEvent.AddListener(TerminalAlertHandler);
+
+        // Get Patrol Points in Scene
+        points = GameObject
+            .FindGameObjectsWithTag("PatrolPoint")
+            .Select(point => point.transform)
+            .ToArray();
     }
 
     /// <summary>
@@ -103,60 +176,165 @@ public class EnemySuspicion : MonoBehaviour
     /// </summary>
     void Update()
     {
-        // If Alerted...
+        // Get Player Visibility
+        playerVisible = PlayerVisible();
+
+        // If Suspicion Is Alerted...
         if (suspicion == Suspicion.Alerted)
         {
-            // If At Terminal...
-            if (!agent.pathPending && agent.remainingDistance < 0.5f)
+            /*
+            if (PlayerVisible())
             {
-                // If Terminal Counter Completed...
-                if (terminalCounter >= terminalComplete)
+                if (type == EnemyType.Guard)
                 {
-                    GameManager.Instance.TerminalAlertEvent.Invoke();
+                    agent.destination = player.transform.position;
+                }
+            }
+            else { }
+
+            if (type == EnemyType.Scientist)
+            {
+                // If At Terminal...
+                if (!agent.pathPending && agent.remainingDistance < 0.5f)
+                {
+                    // If Terminal Counter Completed...
+                    if (terminalCounter >= terminalComplete)
+                    {
+                        GameManager.Instance.TerminalAlertEvent.Invoke(lastPlayerPosition);
+                    }
+
+                    terminalCounter += Time.deltaTime;
+
+                    return;
+                }
+            }
+            */
+        }
+        // If Suspicion Is Curious...
+        else if (suspicion == Suspicion.Curious)
+        {
+            // If Player Is Detected...
+            if (PlayerVisible())
+            {
+                agent.isStopped = false;
+                agent.destination = player.transform.position;
+
+                if (IncrementCounter(ref detectedCounter, DetectedThreshold, Time.deltaTime))
+                {
+                    suspicion = Suspicion.Alerted;
+
+                    // If Enemy Is Scientist
+                    if (type == EnemyType.Scientist)
+                    {
+                        agent.destination = FindClosestTerminal().transform.position;
+                        lastPlayerPosition = player.transform.position;
+                    }
                 }
 
-                terminalCounter += Time.deltaTime;
+                // Reset Curious Cooldown
+                if (curiousCooldownCoroutine != null)
+                {
+                    StopCoroutine(curiousCooldownCoroutine);
+                    curiousCooldownCoroutine = null;
+                }
 
-                return;
+                // Stop Looking Last Player Location Check
+                if (playerLastLocationCoroutine != null)
+                {
+                    StopCoroutine(playerLastLocationCoroutine);
+                    playerLastLocationCoroutine = null;
+                }
             }
             else
             {
-                return;
+                // If Not Going to Look for Last Location...
+                if (playerLastLocationCoroutine == null)
+                {
+                    // Initiate Last Location Check
+                    playerLastLocationCoroutine = GoLastPlayerLocation(1);
+                    StartCoroutine(playerLastLocationCoroutine);
+                }
+
+                if (!agent.pathPending && agent.remainingDistance < 0.5f)
+                {
+                    PatrolNextPoint();
+                    agent.speed = 3;
+                }
+
+                IncrementCounter(ref detectedCounter, DetectedThreshold, -Time.deltaTime);
+
+                if (curiousCooldownCoroutine == null)
+                {
+                    curiousCooldownCoroutine = CuriousCooldown(5);
+                    StartCoroutine(curiousCooldownCoroutine);
+                }
             }
         }
-
-        // If Player Is Detected...
-        if (PlayerDetected())
-        {
-            // Set Destination to Player and Speed Up
-            agent.destination = player.transform.position;
-            agent.speed = 5;
-
-            detectedCounter = Mathf.Min(detectedCounter + Time.deltaTime, detectedThreshold);
-
-            if (detectedCounter >= detectedThreshold)
-            {
-                suspicion = Suspicion.Alerted;
-                agent.destination = FindClosestTerminal().transform.position;
-            }
-        }
+        // Else No Suspicion...
         else
         {
-            detectedCounter = Mathf.Max(detectedCounter - Time.deltaTime, 0);
-
-            if (!agent.pathPending && agent.remainingDistance < 0.5f)
+            // If Player Is Detected...
+            if (PlayerVisible())
             {
-                PatrolNextPoint();
-                agent.speed = 3;
+                // Stop Enemy
+                agent.isStopped = true;
+
+                // Resume Agent Movement
+                if (resumePatrolCoroutine != null)
+                {
+                    StopCoroutine(resumePatrolCoroutine);
+                }
+
+                resumePatrolCoroutine = ResumePatrolling(1);
+                StartCoroutine(resumePatrolCoroutine);
+
+                if (IncrementCounter(ref spottedCounter, SpottedThreshold, Time.deltaTime))
+                {
+                    suspicion = Suspicion.Curious;
+                    agent.destination = FindClosestTerminal().transform.position;
+                }
+
+                // Look at Player
+                Quaternion rotation = Quaternion.LookRotation(
+                    player.transform.position - transform.position
+                );
+
+                transform.rotation = Quaternion.Lerp(
+                    transform.rotation,
+                    rotation,
+                    Time.deltaTime * 10
+                );
+            }
+            else
+            {
+                IncrementCounter(ref spottedCounter, SpottedThreshold, -Time.deltaTime);
+
+                if (!agent.pathPending && agent.remainingDistance < 0.5f)
+                {
+                    PatrolNextPoint();
+                    agent.speed = 3;
+                }
             }
         }
     }
+
+    #region State Handlers
+
+    private void AlertedHandler() { }
+
+    private void CuriousHandler() { }
+
+    private void PatrolHandler() { }
+
+    #endregion
+
+    #region Environment Checks
 
     /// <summary>
     /// Verify If Player Is Detected
     /// </summary>
     /// <returns> True or False Based on If Player Is Detected </returns>
-    public bool PlayerDetected()
+    public bool PlayerVisible()
     {
         // Compare Distance Between Player and Enemy
         Vector3 playerToTurret = player.transform.position - transform.position;
@@ -196,22 +374,6 @@ public class EnemySuspicion : MonoBehaviour
     }
 
     /// <summary>
-    /// Start Patroling Next Patrol Point
-    /// </summary>
-    void PatrolNextPoint()
-    {
-        // If There Are No Points...
-        if (points.Length == 0)
-            return;
-
-        // Change Patrol Point
-        agent.destination = points[currentPatrolPoint].position;
-
-        // Set New Current Patrol Point
-        currentPatrolPoint = (currentPatrolPoint + 1) % points.Length;
-    }
-
-    /// <summary>
     /// Find Terminal Closest to Enemy
     /// </summary>
     /// <returns> Closest Terminal </returns>
@@ -241,27 +403,121 @@ public class EnemySuspicion : MonoBehaviour
         return closest;
     }
 
-    /// <summary>
-    /// Get Detected Percentage
-    /// </summary>
-    /// <returns> Value from 0 to 1 </returns>
-    public float GetPercentageDetected()
-    {
-        return detectedCounter / detectedThreshold;
-    }
+    #endregion
+
+    #region Event Handlers
 
     /// <summary>
     /// Handle Terminal Alert Event
     /// </summary>
-    public void TerminalAlertHandler()
+    public void TerminalAlertHandler(Vector3 position)
     {
         // Set Suspiciton to Alerted
         suspicion = Suspicion.Alerted;
 
         // Max Detected Counter
-        detectedCounter = detectedThreshold;
+        SpottedCounter = SpottedThreshold;
 
         // Set Destination to Player
-        agent.destination = player.transform.position;
+        agent.destination = position;
     }
+
+    #endregion
+
+    #region Coroutines
+
+    /// <summary>
+    /// Coroutine to Resume Patrolling After Delay
+    /// </summary>
+    /// <param name="delay"> Delay in Seconds </param>
+    IEnumerator ResumePatrolling(float delay)
+    {
+        // Apply Delay
+        yield return new WaitForSeconds(delay);
+
+        // If Patrolling...
+        if (suspicion == Suspicion.Patrol)
+            // Resume Patrolling
+            agent.isStopped = false;
+
+        yield return null;
+    }
+
+    /// <summary>
+    /// Coroutine to Go to Last Player Location After Delay
+    /// </summary>
+    /// <param name="delay"> Delay in Seconds </param>
+    IEnumerator GoLastPlayerLocation(float delay)
+    {
+        // Apply Delay
+        yield return new WaitForSeconds(delay);
+
+        // If Still Curious...
+        if (suspicion == Suspicion.Curious)
+        {
+            // Resume and Go to Player Location
+            agent.isStopped = false;
+            agent.destination = player.transform.position;
+        }
+
+        yield return null;
+    }
+
+    /// <summary>
+    /// Coroutine for Curiousity Cooldown After Delay
+    /// </summary>
+    /// <param name="delay"> Delay in Seconds </param>
+    IEnumerator CuriousCooldown(float delay)
+    {
+        // Apply Delay
+        yield return new WaitForSeconds(delay);
+
+        // If Suspicion Curious...
+        if (suspicion == Suspicion.Curious)
+            // Switch Back to Patrolling
+            suspicion = Suspicion.Patrol;
+
+        yield return null;
+    }
+
+    #endregion
+
+    #region Helpers
+
+    /// <summary>
+    /// Start Patroling Next Patrol Point
+    /// </summary>
+    void PatrolNextPoint()
+    {
+        // If There Are No Points...
+        if (points.Length == 0)
+            return;
+
+        // Change Patrol Point
+        agent.destination = points[currentPatrolPoint].position;
+
+        // Set New Current Patrol Point
+        currentPatrolPoint = (currentPatrolPoint + 1) % points.Length;
+    }
+
+    /// <summary>
+    /// Increase Counter by Increment
+    /// </summary>
+    /// <param name="counter"> Value to Increase </param>
+    /// <param name="threshold"> Max Value </param>
+    /// <param name="increment"> Increment Value </param>
+    /// <returns> True or False Based on If Counter Is At Threshold </returns>
+    private bool IncrementCounter(ref float counter, float threshold, float increment)
+    {
+        counter = Mathf.Max(Mathf.Min(counter + increment, threshold), 0);
+
+        if (counter >= threshold)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    #endregion
 }

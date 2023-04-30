@@ -26,13 +26,13 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6226845806371430337}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 6226845808088296069}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
@@ -66,7 +66,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -7323044252749751757, guid: 6e5e73e610efcc548a6abf65d658ebca, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -88,20 +88,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc91704a03ca73740825a3762757c49e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  meterSprites:
-  - {fileID: -7323044252749751757, guid: 6e5e73e610efcc548a6abf65d658ebca, type: 3}
-  - {fileID: 4920142517458433626, guid: 6e5e73e610efcc548a6abf65d658ebca, type: 3}
-  - {fileID: -3757540187605783961, guid: 6e5e73e610efcc548a6abf65d658ebca, type: 3}
-  - {fileID: 4707830402284873169, guid: 6e5e73e610efcc548a6abf65d658ebca, type: 3}
-  - {fileID: 8386144881860475842, guid: 6e5e73e610efcc548a6abf65d658ebca, type: 3}
-  - {fileID: 8607741768818504908, guid: 6e5e73e610efcc548a6abf65d658ebca, type: 3}
-  - {fileID: 6230997898010408116, guid: 6e5e73e610efcc548a6abf65d658ebca, type: 3}
-  - {fileID: -8811168532389680021, guid: 6e5e73e610efcc548a6abf65d658ebca, type: 3}
-  - {fileID: 3525779564189599977, guid: 6e5e73e610efcc548a6abf65d658ebca, type: 3}
-  - {fileID: 892141088337315740, guid: 6e5e73e610efcc548a6abf65d658ebca, type: 3}
-  - {fileID: -4696014345146351802, guid: 6e5e73e610efcc548a6abf65d658ebca, type: 3}
-  es: {fileID: 0}
-  img: {fileID: 0}
+  spottedAnimation: {fileID: 11400000, guid: 4c4855f25c8d954439456a1ab2aaea33, type: 2}
+  detectedAnimation: {fileID: 11400000, guid: 065a97a7346954942b050bd30e9ee5f8, type: 2}
+  alertedAnimation: {fileID: 11400000, guid: b891610770a85e24a8bccdbba310af87, type: 2}
 --- !u!1 &6226845806880977454
 GameObject:
   m_ObjectHideFlags: 0
@@ -120,7 +109,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6226845806880977449
 Transform:
   m_ObjectHideFlags: 0
@@ -211,7 +200,7 @@ GameObject:
   - component: {fileID: 6226845806965860341}
   - component: {fileID: 6226845806965860336}
   - component: {fileID: 6226845806965860339}
-  - component: {fileID: 6226845806965860337}
+  - component: {fileID: 3400834490328767045}
   m_Layer: 0
   m_Name: TestEnemy
   m_TagString: Untagged
@@ -382,7 +371,7 @@ Light:
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
---- !u!114 &6226845806965860337
+--- !u!114 &3400834490328767045
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -391,19 +380,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 6226845806965860346}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 714bb105ac5c26c41ac0c72cb9fa51e6, type: 3}
+  m_Script: {fileID: 11500000, guid: 0429508268bc64443a08dd30c3d18b27, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 0}
   maxAngle: 45
   maxDistance: 10
-  points:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  suspicion: 0
+  points: []
 --- !u!1 &6226845808088296074
 GameObject:
   m_ObjectHideFlags: 0
