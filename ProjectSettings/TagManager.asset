@@ -7,11 +7,13 @@ TagManager:
   - Terminal
   - PatrolPoint
   - Exit
+  - Possession
+  - Floor
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Environment
   - Water
   - UI
   - 
