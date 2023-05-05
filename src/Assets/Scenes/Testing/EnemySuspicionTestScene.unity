@@ -2316,7 +2316,7 @@ Camera:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingPath: -1
-  m_TargetTexture: {fileID: 0}
+  m_TargetTexture: {fileID: 8400000, guid: e8d7a2a5cf2e45c42aaeed904922f694, type: 2}
   m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 1
@@ -2334,7 +2334,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1888640361}
   m_LocalRotation: {x: 0.27477816, y: -0, z: -0, w: 0.9615076}
-  m_LocalPosition: {x: 0, y: 19.82, z: -30.07}
+  m_LocalPosition: {x: 14.91, y: 3.97, z: -14.19}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
