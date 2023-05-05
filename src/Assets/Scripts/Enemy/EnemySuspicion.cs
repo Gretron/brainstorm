@@ -24,7 +24,7 @@ public enum Suspicion
 }
 
 /// <summary>
-/// Enemy Patroling Behaviour
+/// Enemy Suspicion Behaviour
 /// </summary>
 public class EnemySuspicion : MonoBehaviour
 {
@@ -105,7 +105,7 @@ public class EnemySuspicion : MonoBehaviour
     /// Type of Enemy
     /// </summary>
     [SerializeField]
-    private EnemyType enemyType = EnemyType.Scientist;
+    public EnemyType enemyType = EnemyType.Scientist;
 
     /// <summary>
     /// Enum to Determine Suspicion
@@ -299,11 +299,20 @@ public class EnemySuspicion : MonoBehaviour
             // If Player Is Visible...
             if (PlayerVisible())
             {
-                agent.isStopped = false;
-                agent.destination = player.transform.position;
+                if (IsCloseEnough(player.transform, 5))
+                {
+                    agent.isStopped = true;
+                    LookAtPlayer();
+                }
+                else
+                {
+                    agent.isStopped = false;
+                    agent.destination = player.transform.position;
+                }
 
                 if (IncrementCounter(ref detectedCounter, DetectedThreshold, Time.deltaTime))
                 {
+                    agent.isStopped = false;
                     suspicion = Suspicion.Alerted;
                     agent.speed = 5;
 
@@ -380,15 +389,7 @@ public class EnemySuspicion : MonoBehaviour
                 }
 
                 // Look at Player
-                Quaternion rotation = Quaternion.LookRotation(
-                    player.transform.position - transform.position
-                );
-
-                transform.rotation = Quaternion.Lerp(
-                    transform.rotation,
-                    rotation,
-                    Time.deltaTime * 10
-                );
+                LookAtPlayer();
             }
             else
             {
@@ -678,6 +679,30 @@ public class EnemySuspicion : MonoBehaviour
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// See If Enemy Is Close Enough to Player
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="range"></param>
+    /// <returns></returns>
+    private bool IsCloseEnough(Transform target, float range)
+    {
+        float distance = Vector3.Distance(transform.position, target.position);
+        return distance < range;
+    }
+
+    /// <summary>
+    /// To Make Enemy Look At Player
+    /// </summary>
+    private void LookAtPlayer()
+    {
+        Quaternion rotation = Quaternion.LookRotation(
+            player.transform.position - transform.position
+        );
+
+        transform.rotation = Quaternion.Lerp(transform.rotation, rotation, Time.deltaTime * 10);
     }
 
     #endregion
