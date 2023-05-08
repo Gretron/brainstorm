@@ -119,13 +119,13 @@ public class HostPossession : MonoBehaviour
             Quaternion rotation = host.transform.localRotation * Quaternion.Euler(rotationVector);
             transform.localRotation = Quaternion.Lerp(oldRotation, rotation, lerp);
 
+            GetComponent<BoxCollider>().isTrigger = true;
+
             // Progress Animation
             lerp += Time.deltaTime;
         }
         else if (lerp >= 1 && host != null && isPossesing == true)
         {
-            GetComponent<BoxCollider>().enabled = false;
-
             host.GetComponentInParent<EnemySuspicion>().enabled = false;
             host.GetComponentInParent<NavMeshAgent>().enabled = false;
             host.GetComponentInParent<Movement>().enabled = true;

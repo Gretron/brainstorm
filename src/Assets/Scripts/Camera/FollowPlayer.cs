@@ -59,7 +59,7 @@ public class FollowPlayer : MonoBehaviour
     /// <summary>
     /// Layer Which Constitutes Collisions
     /// </summary>
-    private LayerMask collionLayer;
+    private LayerMask collisionLayer;
 
     /// <summary>
     /// Called Before First Frame Update
@@ -90,7 +90,7 @@ public class FollowPlayer : MonoBehaviour
         RaycastHit hit;
 
         // If Raycast Hits Something...
-        if (Physics.Raycast(ray, out hit, maxDistance, collionLayer))
+        if (Physics.Raycast(ray, out hit, maxDistance, collisionLayer))
         {
             transform.position = hit.point + hit.normal * 0.6f;
         }

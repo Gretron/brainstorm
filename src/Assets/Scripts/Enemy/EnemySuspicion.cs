@@ -58,6 +58,12 @@ public class EnemySuspicion : MonoBehaviour
     /// </summary>
     private float spottedCounter = 0;
 
+    [SerializeField]
+    /// <summary>
+    /// Layer Ignored by Raycast
+    /// </summary>
+    private LayerMask ignoreLayer;
+
     /// <summary>
     /// Counter to Track Detection Progress
     /// </summary>
@@ -469,8 +475,10 @@ public class EnemySuspicion : MonoBehaviour
             Ray ray = new Ray(transform.position, normPlayerToTurret);
 
             // If Raycast Hits Player...
-            if (Physics.Raycast(ray, out hit))
+            if (Physics.Raycast(ray, out hit, maxDistance, ~ignoreLayer))
             {
+                Debug.Log(hit.collider.tag);
+
                 if (hit.collider.tag == "Player")
                 {
                     return true;
