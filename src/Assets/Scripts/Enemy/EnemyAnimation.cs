@@ -12,11 +12,15 @@ public class EnemyAnimation : MonoBehaviour
     private EnemySuspicion suspicion;
     private NavMeshAgent agent;
 
+    private GameObject player;
+
     /// <summary>
     /// Called Before First Frame Update
     /// </summary>
     void Start()
     {
+        // Get References
+        player = GameObject.FindGameObjectWithTag("Player");
         animator = GetComponent<Animator>();
         suspicion = GetComponent<EnemySuspicion>();
         agent = GetComponent<NavMeshAgent>();
@@ -27,15 +31,50 @@ public class EnemyAnimation : MonoBehaviour
     /// </summary>
     void Update()
     {
-        Debug.Log(agent.velocity);
-
         Vector3 s = agent.transform.InverseTransformDirection(agent.velocity);
         float speed = s.z;
         float turn = s.x;
         animator.SetFloat("Velocity", speed);
-        animator.SetFloat("Turn", turn);
 
         Suspicion suspicionState = suspicion.suspicion;
+
+        if (suspicion.IsPlayerVisible)
+        {
+            animator.SetBool("Spotted", true);
+
+            // Get the direction from the enemy to the player
+            Vector3 toPlayer = player.transform.position - transform.position;
+            Vector3 enemyForward = transform.forward;
+            float angle = Vector3.Angle(enemyForward, toPlayer);
+            Vector3 cross = Vector3.Cross(enemyForward, toPlayer);
+
+            if (angle > 15f)
+            {
+                if (cross.y > 0f)
+                {
+                    animator.SetFloat("Turn", 1);
+                }
+                else
+                {
+                    animator.SetFloat("Turn", -1);
+                }
+            }
+            else
+            {
+                animator.SetFloat("Turn", 0);
+            }
+
+            Debug.Log(angle);
+        }
+        else
+        {
+            animator.SetFloat("Turn", 0);
+
+            if (speed != 0)
+            {
+                animator.SetBool("Spotted", false);
+            }
+        }
 
         if (suspicionState == Suspicion.Patrol)
         {

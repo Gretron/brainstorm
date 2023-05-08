@@ -132,7 +132,7 @@ public class EnemySuspicion : MonoBehaviour
     /// <summary>
     /// If Player Is Visible or Not
     /// </summary>
-    private bool playerVisible = false;
+    public bool IsPlayerVisible { get; private set; } = false;
 
     /// <summary>
     /// Is Going to Terminal Or Not
@@ -181,7 +181,7 @@ public class EnemySuspicion : MonoBehaviour
     void Update()
     {
         // Get Player Visibility
-        playerVisible = PlayerVisible();
+        IsPlayerVisible = PlayerVisible();
 
         // If Suspicion Is Alerted...
         if (suspicion == Suspicion.Alerted)
@@ -242,7 +242,7 @@ public class EnemySuspicion : MonoBehaviour
             else if (enemyType == EnemyType.Guard)
             {
                 // If Player Is visible
-                if (playerVisible)
+                if (IsPlayerVisible)
                 {
                     agent.destination = player.transform.position;
                     goingToTerminal = false;
@@ -402,6 +402,28 @@ public class EnemySuspicion : MonoBehaviour
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Coroutine to Resume Patrolling
+    /// </summary>
+    private IEnumerator reenableMoving;
+
+    /// <summary>
+    /// Coroutine to Resume Patrolling After Delay
+    /// </summary>
+    /// <param name="delay"> Delay in Seconds </param>
+    IEnumerator ReenableMoving(float delay)
+    {
+        // Apply Delay
+        yield return new WaitForSeconds(delay);
+
+        // If Patrolling...
+        if (suspicion == Suspicion.Patrol)
+            // Resume Patrolling
+            agent.updatePosition = true;
+
+        yield return null;
     }
 
     #region State Handlers
@@ -702,7 +724,7 @@ public class EnemySuspicion : MonoBehaviour
             player.transform.position - transform.position
         );
 
-        transform.rotation = Quaternion.Lerp(transform.rotation, rotation, Time.deltaTime * 10);
+        transform.rotation = Quaternion.Lerp(transform.rotation, rotation, Time.deltaTime * 3);
     }
 
     #endregion
