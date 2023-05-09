@@ -70,7 +70,7 @@ public class FollowPlayer : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player");
 
         // Calculate Inital Offset
-        cameraOffset = player.transform.position + offset;
+        cameraOffset = offset;
 
         // Hide Cursor
         Cursor.lockState = CursorLockMode.Locked;

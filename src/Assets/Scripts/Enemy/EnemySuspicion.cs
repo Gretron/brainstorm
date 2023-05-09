@@ -475,7 +475,7 @@ public class EnemySuspicion : MonoBehaviour
             Ray ray = new Ray(transform.position, normPlayerToTurret);
 
             // If Raycast Hits Player...
-            if (Physics.Raycast(ray, out hit, maxDistance, ~ignoreLayer))
+            if (Physics.Raycast(ray, out hit, maxDistance, ~LayerMask.GetMask("Ignore Raycast")))
             {
                 Debug.Log(hit.collider.tag);
 

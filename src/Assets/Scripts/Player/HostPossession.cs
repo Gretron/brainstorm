@@ -25,6 +25,11 @@ public class HostPossession : MonoBehaviour
     private Rigidbody rb;
 
     /// <summary>
+    /// Player Animator
+    /// </summary>
+    private Animator animator;
+
+    /// <summary>
     /// Player Movement Component
     /// </summary>
     private Movement movement;
@@ -81,6 +86,7 @@ public class HostPossession : MonoBehaviour
         // Get References
         rb = GetComponent<Rigidbody>();
         movement = GetComponent<Movement>();
+        animator = GetComponent<Animator>();
 
         // Set Rotation Vector Value
         rotationVector = new Vector3(-90, 0, 0);
@@ -99,12 +105,15 @@ public class HostPossession : MonoBehaviour
             lerp = 0;
             newPosition = host.transform.position;
             isPossesing = true;
+            rb.collisionDetectionMode = CollisionDetectionMode.Discrete;
             rb.isKinematic = true;
             transform.parent = host.transform;
             oldPosition = transform.localPosition;
             oldRotation = transform.localRotation;
 
             movement.enabled = false;
+
+            animator.SetTrigger("Possession");
         }
 
         // If Animation Is Not Done and Host Is Not Null...
@@ -124,11 +133,19 @@ public class HostPossession : MonoBehaviour
             // Progress Animation
             lerp += Time.deltaTime;
         }
-        else if (lerp >= 1 && host != null && isPossesing == true)
+        else if (lerp >= 1 && host != null && isPossesing)
         {
-            host.GetComponentInParent<EnemySuspicion>().enabled = false;
-            host.GetComponentInParent<NavMeshAgent>().enabled = false;
-            host.GetComponentInParent<Movement>().enabled = true;
+            EnemySuspicion suspicion = host.GetComponentInParent<EnemySuspicion>();
+            suspicion.enabled = false;
+
+            NavMeshAgent agent = host.GetComponentInParent<NavMeshAgent>();
+            agent.enabled = false;
+
+            Movement movement = host.GetComponentInParent<Movement>();
+            movement.enabled = true;
+
+            CapsuleCollider collider = host.GetComponentInParent<CapsuleCollider>();
+            collider.enabled = true;
 
             Rigidbody hostRigidbody = host.GetComponentInParent<Rigidbody>();
             hostRigidbody.freezeRotation = true;
@@ -151,7 +168,9 @@ public class HostPossession : MonoBehaviour
         if (other.tag == "Possession")
         {
             canPossess = false;
-            host = null;
+
+            if (!isPossesing)
+                host = null;
         }
     }
 }
