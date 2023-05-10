@@ -63,8 +63,6 @@ public class EnemyAnimation : MonoBehaviour
             {
                 animator.SetFloat("Turn", 0);
             }
-
-            Debug.Log(angle);
         }
         else
         {

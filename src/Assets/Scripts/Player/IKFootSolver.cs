@@ -20,14 +20,15 @@ public class IKFootSolver : MonoBehaviour
     Vector3 currentFootNormal;
     Vector3 newFootNormal;
 
-    Vector3 gizmo;
-
     public float angle = 45f;
     public float magnitude = 1.5f;
 
+    public float nextFootPositionOffset = 1.5f;
+    public float moveDistance = 1.5f;
+
     public float speed = 10f;
 
-    public float footOffset = 1f;
+    public Vector3 footOffset;
 
     public float stepHeight = 0.5f;
 
@@ -42,8 +43,6 @@ public class IKFootSolver : MonoBehaviour
 
     public HostPossession possession;
 
-    private Vector3 originalLocalFootPosition;
-
     // Start is called before the first frame update
     void Start()
     {
@@ -51,8 +50,6 @@ public class IKFootSolver : MonoBehaviour
         body = player.transform;
         bodyRb = player.GetComponent<Rigidbody>();
         possession = player.GetComponent<HostPossession>();
-
-        originalLocalFootPosition = transform.localPosition;
 
         // Find Angle Between Body Forward and Foot
         Vector3 bodyToFoot = Vector3.Normalize(transform.position - body.position);
@@ -65,31 +62,21 @@ public class IKFootSolver : MonoBehaviour
         degreesToFoot = deg * sign;
 
         currentFootPosition = newFootPosition = oldFootPosition = transform.position;
-
-        // possession.hostPossession.AddListener(OnHostPossession);
     }
 
-    private void OnHostPossession()
-    {
-        Debug.Log("Possession Initiated");
-        transform.localPosition = originalLocalFootPosition;
+    Vector3 initialPos;
 
-        enabled = false;
-    }
+    private void OnHostPossession() { }
 
     // Update is called once per frame
     void Update()
     {
         transform.position = currentFootPosition;
 
-        //Debug.DrawLine(Vector3.zero, bodyToFoot, Color.green);
-        //Debug.DrawLine(Vector3.zero, body.forward, Color.red);
-
-        //transform.position = lastTentacleTipPosition;
         Vector3 forward = body.forward;
         Quaternion rotation = Quaternion.Euler(0, degreesToFoot, 0f);
-        Vector3 footPosition = rotation * (forward * footOffset) * magnitude;
-        gizmo = footPosition;
+        Vector3 footPosition =
+            (rotation * forward) * nextFootPositionOffset + (body.rotation * footOffset);
 
         bool otherFootMoving = otherFoot != null ? otherFoot.Moving() : false;
 
@@ -99,7 +86,7 @@ public class IKFootSolver : MonoBehaviour
         {
             // When Distance Between Positions Is Greate Than Step Distance And Previous Step Completed
             if (
-                Vector3.Distance(newFootPosition, hit.point) > magnitude
+                Vector3.Distance(newFootPosition, hit.point) > moveDistance
                 && !otherFootMoving
                 && lerp >= 1
             )
@@ -132,12 +119,12 @@ public class IKFootSolver : MonoBehaviour
         }
     }
 
-    private void OnDisable() { }
-
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position + transform.up * magnitude, 0.1f);
+        Gizmos.DrawWireSphere(transform.position + transform.up * nextFootPositionOffset, 0.1f);
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(transform.position, transform.position + transform.up * moveDistance);
     }
 
     public bool Moving()

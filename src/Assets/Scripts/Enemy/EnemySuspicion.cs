@@ -179,6 +179,17 @@ public class EnemySuspicion : MonoBehaviour
             .FindGameObjectsWithTag("PatrolPoint")
             .Select(point => point.transform)
             .ToArray();
+
+        Transform temp;
+
+        // Shuffle Patrol Points
+        for (int i = 0; i < points.Length; i++)
+        {
+            int rnd = Random.Range(0, points.Length);
+            temp = points[rnd];
+            points[rnd] = points[i];
+            points[i] = temp;
+        }
     }
 
     /// <summary>
@@ -477,7 +488,7 @@ public class EnemySuspicion : MonoBehaviour
             // If Raycast Hits Player...
             if (Physics.Raycast(ray, out hit, maxDistance, ~LayerMask.GetMask("Ignore Raycast")))
             {
-                Debug.Log(hit.collider.tag);
+                Debug.Log(hit.collider.name);
 
                 if (hit.collider.tag == "Player")
                 {
