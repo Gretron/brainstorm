@@ -30,7 +30,7 @@ public class EnemyAnimation : MonoBehaviour
     private GameObject player;
 
     /// <summary>
-    /// Look Rig GameObject
+    /// Look Rig Component
     /// </summary>
     private Rig lookRig;
 
@@ -47,13 +47,13 @@ public class EnemyAnimation : MonoBehaviour
 
         GameObject rigGameObject = gameObject.transform.Find("LookRig").gameObject;
         lookRig = rigGameObject.GetComponent<Rig>();
-        MultiAimConstraint aim = lookRig.transform
+        MultiAimConstraint look = lookRig.transform
             .Find("HeadLook")
             .GetComponent<MultiAimConstraint>();
-        var data = aim.data.sourceObjects;
+        var data = look.data.sourceObjects;
         data.Clear();
         data.Add(new WeightedTransform(player.transform, 1));
-        aim.data.sourceObjects = data;
+        look.data.sourceObjects = data;
 
         GetComponent<RigBuilder>().Build();
     }

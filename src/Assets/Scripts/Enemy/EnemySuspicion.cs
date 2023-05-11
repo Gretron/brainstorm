@@ -53,11 +53,6 @@ public class EnemySuspicion : MonoBehaviour
     [SerializeField]
     private float maxDistance = 10;
 
-    /// <summary>
-    /// Counter to Track Detection Progress
-    /// </summary>
-    private float spottedCounter = 0;
-
     [SerializeField]
     /// <summary>
     /// Layer Ignored by Raycast
@@ -67,35 +62,58 @@ public class EnemySuspicion : MonoBehaviour
     /// <summary>
     /// Counter to Track Detection Progress
     /// </summary>
-    public float SpottedCounter
+    public float CuriousCounter
     {
-        get { return spottedCounter; }
-        private set { spottedCounter = value; }
+        get { return curiousCounter; }
+        private set { curiousCounter = value; }
     }
-
-    /// <summary>
-    /// Threshold for Detection
-    /// </summary>
-    public float SpottedThreshold { get; private set; } = 3;
 
     /// <summary>
     /// Counter to Track Detection Progress
     /// </summary>
-    private float detectedCounter = 0;
+    private float curiousCounter = 0;
+
+    /// <summary>
+    /// Threshold for Curious State
+    /// </summary>
+    public float CuriousThreshold
+    {
+        get { return curiousThreshold; }
+    }
+
+    [SerializeField]
+    /// <summary>
+    /// Threshold for Curious State
+    /// </summary>
+    private float curiousThreshold = 3;
 
     /// <summary>
     /// Counter to Track Detection Progress
     /// </summary>
-    public float DetectedCounter
+    private float alertedCounter = 0;
+
+    /// <summary>
+    /// Counter to Track Detection Progress
+    /// </summary>
+    public float AlertedCounter
     {
-        get { return detectedCounter; }
-        private set { detectedCounter = value; }
+        get { return alertedCounter; }
+        private set { alertedCounter = value; }
     }
 
     /// <summary>
-    /// Threshold for Detection
+    /// Threshold for Alerted State
     /// </summary>
-    public float DetectedThreshold { get; private set; } = 3;
+    public float AlertedThreshold
+    {
+        get { return alertedThreshold; }
+    }
+
+    [SerializeField]
+    /// <summary>
+    /// Threshold for Alerted State
+    /// </summary>
+    private float alertedThreshold = 3;
 
     /// <summary>
     /// Terminal Counter
@@ -327,7 +345,7 @@ public class EnemySuspicion : MonoBehaviour
                     agent.destination = player.transform.position;
                 }
 
-                if (IncrementCounter(ref detectedCounter, DetectedThreshold, Time.deltaTime))
+                if (IncrementCounter(ref alertedCounter, AlertedThreshold, Time.deltaTime))
                 {
                     agent.isStopped = false;
                     suspicion = Suspicion.Alerted;
@@ -372,7 +390,7 @@ public class EnemySuspicion : MonoBehaviour
                     agent.speed = 3;
                 }
 
-                IncrementCounter(ref detectedCounter, DetectedThreshold, -Time.deltaTime);
+                IncrementCounter(ref alertedCounter, AlertedThreshold, -Time.deltaTime);
 
                 if (curiousCountdownCoroutine == null)
                 {
@@ -399,7 +417,7 @@ public class EnemySuspicion : MonoBehaviour
                 resumePatrolCoroutine = ResumePatrolling(1);
                 StartCoroutine(resumePatrolCoroutine);
 
-                if (IncrementCounter(ref spottedCounter, SpottedThreshold, Time.deltaTime))
+                if (IncrementCounter(ref curiousCounter, CuriousThreshold, Time.deltaTime))
                 {
                     suspicion = Suspicion.Curious;
                     agent.destination = FindClosestTerminal().transform.position;
@@ -410,7 +428,7 @@ public class EnemySuspicion : MonoBehaviour
             }
             else
             {
-                IncrementCounter(ref spottedCounter, SpottedThreshold, -Time.deltaTime);
+                IncrementCounter(ref curiousCounter, CuriousThreshold, -Time.deltaTime);
 
                 if (!agent.pathPending && agent.remainingDistance < 0.5f)
                 {
@@ -573,7 +591,7 @@ public class EnemySuspicion : MonoBehaviour
         suspicion = Suspicion.Alerted;
 
         // Max Detected Counter
-        SpottedCounter = SpottedThreshold;
+        CuriousCounter = CuriousThreshold;
 
         // Start and Speed Up
         agent.isStopped = false;

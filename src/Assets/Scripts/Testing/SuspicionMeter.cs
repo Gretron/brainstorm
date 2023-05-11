@@ -38,11 +38,11 @@ public class SuspicionMeter : AnimatableImage
         }
         else if (es.suspicion == Suspicion.Curious)
         {
-            Play(detectedAnimation, es.DetectedCounter, es.DetectedThreshold);
+            Play(detectedAnimation, es.AlertedCounter, es.AlertedThreshold);
         }
         else
         {
-            Play(spottedAnimation, es.SpottedCounter, es.SpottedThreshold);
+            Play(spottedAnimation, es.CuriousCounter, es.CuriousThreshold);
         }
 
         transform.parent.transform.LookAt(Camera.main.transform);
