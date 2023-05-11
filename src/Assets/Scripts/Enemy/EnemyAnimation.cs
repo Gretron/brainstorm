@@ -35,6 +35,11 @@ public class EnemyAnimation : MonoBehaviour
     private Rig lookRig;
 
     /// <summary>
+    /// Enemy Player-Controlled Movement
+    /// </summary>
+    private Movement movement;
+
+    /// <summary>
     /// Called Before First Frame Update
     /// </summary>
     void Start()
@@ -44,6 +49,7 @@ public class EnemyAnimation : MonoBehaviour
         animator = GetComponent<Animator>();
         suspicion = GetComponent<EnemySuspicion>();
         agent = GetComponent<NavMeshAgent>();
+        movement = GetComponent<Movement>();
 
         GameObject rigGameObject = gameObject.transform.Find("LookRig").gameObject;
         lookRig = rigGameObject.GetComponent<Rig>();
@@ -63,10 +69,26 @@ public class EnemyAnimation : MonoBehaviour
     /// </summary>
     void Update()
     {
-        // Get Velocity from Agent
-        Vector3 velocity = agent.transform.InverseTransformDirection(agent.velocity);
-        float speed = velocity.z;
-        animator.SetFloat("Velocity", speed);
+        float speed = 0;
+
+        if (movement.enabled)
+        {
+            // Get Input Axes
+            float horizontal = Input.GetAxisRaw("Horizontal");
+            float vertical = Input.GetAxisRaw("Vertical");
+
+            // Make Direction Vector From Axes
+            Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
+            speed = direction.sqrMagnitude * 3;
+            animator.SetFloat("Velocity", speed);
+        }
+        else
+        {
+            // Get Velocity from Agent
+            Vector3 velocity = agent.transform.InverseTransformDirection(agent.velocity);
+            speed = velocity.z;
+            animator.SetFloat("Velocity", speed);
+        }
 
         Suspicion suspicionState = suspicion.suspicion;
 
