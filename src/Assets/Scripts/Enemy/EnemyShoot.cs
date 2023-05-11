@@ -95,7 +95,7 @@ public class EnemyShoot : MonoBehaviour
         {
             animator.SetLayerWeight(
                 gunLayerIndex,
-                animator.GetLayerWeight(gunLayerIndex) - Time.deltaTime
+                Mathf.Max(animator.GetLayerWeight(gunLayerIndex) - (Time.deltaTime * 5), 0)
             );
 
             aimRig.weight -= Time.deltaTime;
@@ -117,7 +117,7 @@ public class EnemyShoot : MonoBehaviour
 
             animator.SetLayerWeight(
                 gunLayerIndex,
-                animator.GetLayerWeight(gunLayerIndex) + (Time.deltaTime * 5)
+                Mathf.Min(animator.GetLayerWeight(gunLayerIndex) + (Time.deltaTime * 5), 1)
             );
 
             if (suspicion.IsPlayerVisible)
