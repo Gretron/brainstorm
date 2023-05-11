@@ -279,7 +279,17 @@ public class EnemySuspicion : MonoBehaviour
                 // If Player Is visible
                 if (IsPlayerVisible)
                 {
-                    agent.destination = player.transform.position;
+                    if (IsCloseEnough(player.transform, 5))
+                    {
+                        agent.isStopped = true;
+                        LookAtPlayer();
+                    }
+                    else
+                    {
+                        agent.isStopped = false;
+                        agent.destination = player.transform.position;
+                    }
+
                     goingToTerminal = false;
 
                     if (goTerminalCountdown != null)
@@ -291,6 +301,8 @@ public class EnemySuspicion : MonoBehaviour
                 // Else Player Is Not Visible...
                 else
                 {
+                    agent.isStopped = false;
+
                     // If Current Going to Terminal....
                     if (goingToTerminal)
                     {
@@ -506,8 +518,6 @@ public class EnemySuspicion : MonoBehaviour
             // If Raycast Hits Player...
             if (Physics.Raycast(ray, out hit, maxDistance, ~LayerMask.GetMask("Ignore Raycast")))
             {
-                Debug.Log(hit.collider.name);
-
                 if (hit.collider.tag == "Player")
                 {
                     return true;

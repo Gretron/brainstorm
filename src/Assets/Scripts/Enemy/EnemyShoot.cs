@@ -21,6 +21,18 @@ public class EnemyShoot : MonoBehaviour
     /// </summary>
     private GameObject player;
 
+    [SerializeField]
+    /// <summary>
+    /// Bullet Reference
+    /// </summary>
+    private GameObject bullet;
+
+    [SerializeField]
+    /// <summary>
+    /// Enemy Gun Tip Transform
+    /// </summary>
+    private Transform gunTip;
+
     /// <summary>
     /// Aim Rig Component
     /// </summary>
@@ -40,6 +52,30 @@ public class EnemyShoot : MonoBehaviour
     /// NPC Navigation
     /// </summary>
     private NavMeshAgent agent;
+
+    /// <summary>
+    /// Enemy Ammo Amount
+    /// </summary>
+    public int Ammo
+    {
+        get { return ammo; }
+    }
+
+    /// <summary>
+    /// Enemy Ammo Amount
+    /// </summary>
+    private int ammo = 5;
+
+    [SerializeField]
+    /// <summary>
+    /// Enemy Shooting Speed
+    /// </summary>
+    private int shootSpeed = 5;
+
+    /// <summary>
+    /// Counter Until Next Shot
+    /// </summary>
+    private float shootCounter = 0;
 
     /// <summary>
     /// Called Before First Frame Update
@@ -115,20 +151,41 @@ public class EnemyShoot : MonoBehaviour
                 bodyWalkConstraint.weight -= Time.deltaTime * 3;
             }
 
-            animator.SetLayerWeight(
-                gunLayerIndex,
-                Mathf.Min(animator.GetLayerWeight(gunLayerIndex) + (Time.deltaTime * 5), 1)
-            );
-
             if (suspicion.IsPlayerVisible)
             {
                 aimRig.weight += Time.deltaTime;
+
+                if (suspicionState == Suspicion.Alerted)
+                {
+                    if (shootCounter >= shootSpeed)
+                    {
+                        shootCounter = 0;
+
+                        var bulletInstance = GameObject.Instantiate(
+                            bullet,
+                            gunTip.position,
+                            gunTip.rotation
+                        );
+                    }
+
+                    if (aimRig.weight == 1)
+                    {
+                        shootCounter += Time.deltaTime;
+                    }
+                }
             }
             else
             {
                 aimRig.weight -= Time.deltaTime;
             }
+
+            if (suspicionState == Suspicion.Curious)
+            {
+                animator.SetLayerWeight(
+                    gunLayerIndex,
+                    Mathf.Min(animator.GetLayerWeight(gunLayerIndex) + (Time.deltaTime * 5), 1)
+                );
+            }
         }
-        else if (suspicionState == Suspicion.Alerted) { }
     }
 }

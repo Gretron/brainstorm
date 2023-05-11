@@ -9,6 +9,7 @@ TagManager:
   - Exit
   - Possession
   - Floor
+  - Bullet
   layers:
   - Default
   - TransparentFX

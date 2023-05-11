@@ -31,6 +31,36 @@ Transform:
   m_Father: {fileID: 293414545731854950}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &105600669647817834
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3791957024467610718}
+  m_Layer: 0
+  m_Name: GunTip
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3791957024467610718
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 105600669647817834}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.1357, y: 0.0603, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 7158070700043391706}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &254381372813308302
 GameObject:
   m_ObjectHideFlags: 0
@@ -3561,6 +3591,7 @@ Transform:
   - {fileID: 5089513163895334835}
   - {fileID: 8360951992515708514}
   - {fileID: 3438530744853740472}
+  - {fileID: 3791957024467610718}
   m_Father: {fileID: 6239146343257484890}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
@@ -3749,8 +3780,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4
   curiousThreshold: 3
-  alertedThreshold: 1000
-  enemyType: 0
+  alertedThreshold: 3
+  enemyType: 1
   suspicion: 0
   points: []
   keycardHolder: 0
@@ -3947,6 +3978,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f79a9cbc54be75e4db7672ecad51df29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bullet: {fileID: 3573575757624495923, guid: 9afc4c56ded39cc4dbd48443bd2feb16, type: 3}
+  gunTip: {fileID: 3791957024467610718}
+  shootSpeed: 5
 --- !u!1 &8124803941196721630
 GameObject:
   m_ObjectHideFlags: 0
