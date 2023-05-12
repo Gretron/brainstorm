@@ -166,7 +166,7 @@ public class HostPossession : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        if (other.tag == "Possession")
+        if (other.tag == "Possession" && !isPossesing)
         {
             canPossess = true;
             host = other.gameObject;
@@ -175,7 +175,7 @@ public class HostPossession : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.tag == "Possession")
+        if (other.tag == "Possession" && !isPossesing)
         {
             canPossess = false;
 
