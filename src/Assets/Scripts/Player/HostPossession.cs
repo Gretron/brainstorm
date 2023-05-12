@@ -20,6 +20,11 @@ public class HostPossession : MonoBehaviour
     public GameObject host;
 
     /// <summary>
+    /// Host to be Possessed
+    /// </summary>
+    public GameObject enemy;
+
+    /// <summary>
     /// Player Rigidbody
     /// </summary>
     private Rigidbody rb;
@@ -38,6 +43,11 @@ public class HostPossession : MonoBehaviour
     /// Follow Player Camera Component
     /// </summary>
     private FollowPlayer followPlayer;
+
+    /// <summary>
+    /// Enemy Host Health
+    /// </summary>
+    private EnemyHealth hostHealth;
 
     /// <summary>
     /// Able to Possess Flag
@@ -78,6 +88,11 @@ public class HostPossession : MonoBehaviour
     /// Currently Possessing Flag
     /// </summary>
     public bool isPossesing = false;
+
+    /// <summary>
+    /// Currently Possessed Flag
+    /// </summary>
+    public bool isPossessed = false;
 
     /// <summary>
     /// Called Before First Frame Update
@@ -139,14 +154,14 @@ public class HostPossession : MonoBehaviour
             // Progress Animation
             lerp += Time.deltaTime;
         }
-        else if (lerp >= 1 && host != null && isPossesing)
+        else if (lerp >= 1 && host != null && isPossesing && !isPossessed)
         {
             followPlayer.SetVerticalAngles(CameraVerticalAngles.Human);
 
             EnemySuspicion suspicion = host.GetComponentInParent<EnemySuspicion>();
             suspicion.enabled = false;
 
-            GameObject enemy = suspicion.gameObject;
+            enemy = suspicion.gameObject;
 
             NavMeshAgent agent = enemy.GetComponent<NavMeshAgent>();
             agent.enabled = false;
@@ -161,12 +176,31 @@ public class HostPossession : MonoBehaviour
             hostRigidbody.freezeRotation = true;
             hostRigidbody.isKinematic = false;
             hostRigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+
+            hostHealth = enemy.GetComponent<EnemyHealth>();
+            EnemyShoot shoot = enemy.GetComponent<EnemyShoot>();
+            GameManager.Instance.hostHealth = hostHealth;
+            GameManager.Instance.hostShoot = shoot;
+
+            isPossessed = true;
         }
+        else if (isPossessed)
+        {
+            hostHealth.TakeDamage(Time.deltaTime * 5);
+        }
+    }
+
+    /// <summary>
+    /// Unpossess Player
+    /// </summary>
+    public void Unpossess()
+    {
+        Debug.Log("Host Unpossessed");
     }
 
     private void OnTriggerStay(Collider other)
     {
-        if (other.tag == "Possession")
+        if (other.tag == "Possession" && !isPossesing)
         {
             canPossess = true;
             host = other.gameObject;
@@ -175,7 +209,7 @@ public class HostPossession : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.tag == "Possession")
+        if (other.tag == "Possession" && !isPossesing)
         {
             canPossess = false;
 
