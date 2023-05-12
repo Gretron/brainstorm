@@ -37,6 +37,28 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private Slider brainPowerSlider;
 
+    [SerializeField]
+    /// <summary>
+    /// Enemy Health Slider UI Component
+    /// </summary>
+    private Slider hostHealthSlider;
+
+    [SerializeField]
+    /// <summary>
+    /// Enemy Gun Slider UI Component
+    /// </summary>
+    private Slider gunSlider;
+
+    /// <summary>
+    /// Health of Current Host
+    /// </summary>
+    public EnemyHealth hostHealth;
+
+    /// <summary>
+    /// Host Shooting Component
+    /// </summary>
+    public EnemyShoot hostShoot;
+
     /// <summary>
     /// Called When Script Instance Is Loaded
     /// </summary>
@@ -70,6 +92,8 @@ public class GameManager : MonoBehaviour
             GameObject.Instantiate(GUI);
             healthSlider = GameObject.Find("HealthSlider").GetComponent<Slider>();
             brainPowerSlider = GameObject.Find("BrainPowerSlider").GetComponent<Slider>();
+            hostHealthSlider = GameObject.Find("HostHealthSlider").GetComponent<Slider>();
+            gunSlider = GameObject.Find("GunSlider").GetComponent<Slider>();
         }
     }
 
@@ -79,6 +103,18 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         brainPowerSlider.value -= Time.deltaTime / 2;
+
+        if (hostHealth)
+        {
+            hostHealthSlider.maxValue = hostHealth.MaxHealth;
+            hostHealthSlider.value = hostHealth.Health;
+        }
+
+        if (hostShoot)
+        {
+            gunSlider.maxValue = hostShoot.MaxAmmo;
+            gunSlider.value = hostShoot.Ammo;
+        }
     }
 
     /// <summary>

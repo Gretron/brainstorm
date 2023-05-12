@@ -491,8 +491,11 @@ public class EnemySuspicion : MonoBehaviour
     /// <returns> True or False Based on If Player Is Detected </returns>
     public bool PlayerVisible()
     {
+        // Vector Position of Enemy Eyes
+        Vector3 eyeSight = (transform.position + transform.forward + transform.up * 3);
+
         // Compare Distance Between Player and Enemy
-        Vector3 playerToTurret = player.transform.position - transform.position;
+        Vector3 playerToTurret = player.transform.position - eyeSight;
 
         // If Distance Is Smaller Than Threshold...
         if (playerToTurret.magnitude > maxDistance)
@@ -513,7 +516,7 @@ public class EnemySuspicion : MonoBehaviour
         {
             // Send Raycast to Player
             RaycastHit hit;
-            Ray ray = new Ray(transform.position, normPlayerToTurret);
+            Ray ray = new Ray(eyeSight, normPlayerToTurret);
 
             // If Raycast Hits Player...
             if (Physics.Raycast(ray, out hit, maxDistance, ~LayerMask.GetMask("Ignore Raycast")))

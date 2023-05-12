@@ -71,15 +71,20 @@ public class EnemyShoot : MonoBehaviour
     /// <summary>
     /// Enemy Ammo Amount
     /// </summary>
-    public int Ammo
+    public int MaxAmmo
     {
-        get { return ammo; }
+        get { return maxAmmo; }
     }
 
     /// <summary>
     /// Enemy Ammo Amount
     /// </summary>
-    private int ammo = 5;
+    private int maxAmmo = 5;
+
+    /// <summary>
+    ///  Current Ammo Amount
+    /// </summary>
+    public int Ammo { get; private set; } = 5;
 
     [SerializeField]
     /// <summary>
@@ -119,18 +124,26 @@ public class EnemyShoot : MonoBehaviour
         MultiAimConstraint bodyConstraint = aimRig.transform
             .Find("BodyAim")
             .GetComponent<MultiAimConstraint>();
-        var bodyData = bodyConstraint.data.sourceObjects;
-        bodyData.Clear();
-        bodyData.Add(new WeightedTransform(player.transform, 1));
-        bodyConstraint.data.sourceObjects = bodyData;
+
+        if (bodyConstraint)
+        {
+            var bodyData = bodyConstraint.data.sourceObjects;
+            bodyData.Clear();
+            bodyData.Add(new WeightedTransform(player.transform, 1));
+            bodyConstraint.data.sourceObjects = bodyData;
+        }
 
         MultiAimConstraint handConstraint = aimRig.transform
             .Find("HandAim")
             .GetComponent<MultiAimConstraint>();
-        var handData = handConstraint.data.sourceObjects;
-        handData.Clear();
-        handData.Add(new WeightedTransform(player.transform, 1));
-        handConstraint.data.sourceObjects = handData;
+
+        if (handConstraint)
+        {
+            var handData = handConstraint.data.sourceObjects;
+            handData.Clear();
+            handData.Add(new WeightedTransform(player.transform, 1));
+            handConstraint.data.sourceObjects = handData;
+        }
 
         GameObject playerRigGameObject = gameObject.transform.Find("PlayerAimRig").gameObject;
         playerAimRig = playerRigGameObject.GetComponent<Rig>();
@@ -138,18 +151,26 @@ public class EnemyShoot : MonoBehaviour
         MultiAimConstraint playerBodyConstraint = playerAimRig.transform
             .Find("BodyAim")
             .GetComponent<MultiAimConstraint>();
-        var playerBodyData = playerBodyConstraint.data.sourceObjects;
-        playerBodyData.Clear();
-        playerBodyData.Add(new WeightedTransform(playerAimTarget, 1));
-        playerBodyConstraint.data.sourceObjects = playerBodyData;
+
+        if (playerBodyConstraint)
+        {
+            var playerBodyData = playerBodyConstraint.data.sourceObjects;
+            playerBodyData.Clear();
+            playerBodyData.Add(new WeightedTransform(playerAimTarget, 1));
+            playerBodyConstraint.data.sourceObjects = playerBodyData;
+        }
 
         MultiAimConstraint playerHandConstraint = playerAimRig.transform
             .Find("HandAim")
             .GetComponent<MultiAimConstraint>();
-        var playerHandData = playerHandConstraint.data.sourceObjects;
-        playerHandData.Clear();
-        playerHandData.Add(new WeightedTransform(playerAimTarget, 1));
-        playerHandConstraint.data.sourceObjects = playerHandData;
+
+        if (playerHandConstraint)
+        {
+            var playerHandData = playerHandConstraint.data.sourceObjects;
+            playerHandData.Clear();
+            playerHandData.Add(new WeightedTransform(playerAimTarget, 1));
+            playerHandConstraint.data.sourceObjects = playerHandData;
+        }
 
         GetComponent<RigBuilder>().Build();
     }
@@ -211,11 +232,16 @@ public class EnemyShoot : MonoBehaviour
 
                 if (Input.GetMouseButtonDown(0))
                 {
-                    var bulletInstance = GameObject.Instantiate(
-                        bullet,
-                        gunTip.position,
-                        gunTip.rotation
-                    );
+                    if (Ammo > 0)
+                    {
+                        var bulletInstance = GameObject.Instantiate(
+                            bullet,
+                            gunTip.position,
+                            gunTip.rotation
+                        );
+
+                        Ammo = Mathf.Max(Ammo - 1, 0);
+                    }
                 }
             }
             else
