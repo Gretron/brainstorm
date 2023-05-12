@@ -3,6 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
+/// Camera Vertical Angles
+/// </summary>
+public enum CameraVerticalAngles
+{
+    Alien = 0,
+    Human = 1,
+}
+
+/// <summary>
 /// Camera Follow Player Behaviour
 /// </summary>
 public class FollowPlayer : MonoBehaviour
@@ -12,6 +21,11 @@ public class FollowPlayer : MonoBehaviour
     /// Player GameObject
     /// </summary>
     private GameObject player;
+
+    /// <summary>
+    /// Camera Component
+    /// </summary>
+    private Camera camera;
 
     [SerializeField]
     /// <summary>
@@ -38,12 +52,7 @@ public class FollowPlayer : MonoBehaviour
     /// <summary>
     /// Maximum Vertical Angle
     /// </summary>
-    private float maxVerticalAngle = 60f;
-
-    /// <summary>
-    /// Current Vertical Angle
-    /// </summary>
-    private float currentVerticalAngle = 0f;
+    private float maxVerticalAngle = 45;
 
     /// <summary>
     /// Computed Camera Offset
@@ -62,15 +71,52 @@ public class FollowPlayer : MonoBehaviour
     private LayerMask collisionLayer;
 
     /// <summary>
+    /// Maximum Zoom Possible
+    /// </summary>
+    private float zoomMax = 40;
+
+    /// <summary>
+    /// Minimum Zoom Possible
+    /// </summary>
+    private float zoomMin = 60;
+
+    /// <summary>
+    /// Zoom Speed Interpolation
+    /// </summary>
+    private float zoomSpeed = 80;
+
+    /// <summary>
+    /// Aim Offset Vector
+    /// </summary>
+    public Vector3 AimOffset { get; private set; }
+
+    /// <summary>
+    /// Aim Offset Speed
+    /// </summary>
+    private float aimOffsetSpeed = 2;
+
+    /// <summary>
+    /// Aim Offset Lerp Amount
+    /// </summary>
+    private float aimOffsetLerp = 0;
+
+    /// <summary>
+    /// Current Vertical Angles
+    /// </summary>
+    public CameraVerticalAngles VerticalAngles { get; private set; }
+
+    /// <summary>
     /// Called Before First Frame Update
     /// </summary>
     void Start()
     {
         // Get References
         player = GameObject.FindGameObjectWithTag("Player");
+        camera = GetComponent<Camera>();
 
         // Calculate Inital Offset
         cameraOffset = offset;
+        AimOffset = Vector3.right;
 
         // Hide Cursor
         Cursor.lockState = CursorLockMode.Locked;
@@ -85,6 +131,23 @@ public class FollowPlayer : MonoBehaviour
     /// </summary>
     private void LateUpdate()
     {
+        Vector3 playerToCamera = (transform.position - player.transform.position).normalized;
+        Vector3 playerToCameraWithoutY = transform.position - player.transform.position;
+        playerToCameraWithoutY.y = 0;
+        playerToCameraWithoutY = playerToCameraWithoutY.normalized;
+
+        /*
+        Debug.DrawLine(player.transform.position, playerToCamera + player.transform.position);
+        Debug.DrawLine(
+            player.transform.position,
+            playerToCameraWithoutY + player.transform.position,
+            Color.red
+        );
+        */
+
+        float sign = playerToCamera.y >= 0 ? 1 : -1;
+        float angle = Vector3.Angle(playerToCamera, playerToCameraWithoutY) * sign;
+
         // Update Camera Position Based on Player Position Offset, with Obstacle Detection
         Ray ray = new Ray(player.transform.position, cameraOffset);
         RaycastHit hit;
@@ -110,24 +173,40 @@ public class FollowPlayer : MonoBehaviour
         // Apply Vertical Offset Based on Mouse Input
         float mouseY = Input.GetAxis("Mouse Y");
 
-        currentVerticalAngle = Mathf.Clamp(
-            currentVerticalAngle + mouseY,
-            minVerticalAngle,
-            maxVerticalAngle
+        Quaternion angleRotation = Quaternion.Euler(
+            0,
+            transform.eulerAngles.y,
+            transform.eulerAngles.z
         );
 
+        Vector3 right = angleRotation * Vector3.right;
+
         // If Current Vertical Angle Is Within Angle Range...
-        if (currentVerticalAngle > minVerticalAngle && currentVerticalAngle < maxVerticalAngle)
+        if (angle >= minVerticalAngle && angle <= maxVerticalAngle)
         {
-            Quaternion angleRotation = Quaternion.Euler(
-                0,
-                transform.eulerAngles.y,
-                transform.eulerAngles.z
-            );
+            float value = -mouseY;
+            float newAngle = angle + -mouseY;
 
-            Vector3 right = angleRotation * Vector3.right;
+            if (newAngle > maxVerticalAngle)
+            {
+                value = -(newAngle - maxVerticalAngle);
+            }
+            else if (newAngle < minVerticalAngle)
+            {
+                value = minVerticalAngle - newAngle;
+            }
 
-            cameraOffset = Quaternion.AngleAxis(mouseY, right) * cameraOffset; // Adds Mouse Input Offset to Current Camera Offset
+            cameraOffset = Quaternion.AngleAxis(value, right) * cameraOffset; // Adds Mouse Input Offset to Current Camera Offset
+        }
+        else if (angle < minVerticalAngle)
+        {
+            float offset = minVerticalAngle - angle;
+            cameraOffset = Quaternion.AngleAxis(offset, right) * cameraOffset;
+        }
+        else if (angle > maxVerticalAngle)
+        {
+            float offset = angle - maxVerticalAngle;
+            cameraOffset = Quaternion.AngleAxis(-offset, right) * cameraOffset;
         }
 
         // Calculate Rotation to Point Camera at Player
@@ -135,5 +214,63 @@ public class FollowPlayer : MonoBehaviour
 
         // Update Camera Rotation to Point at Player
         transform.rotation = lookRotation;
+
+        transform.position += (transform.rotation * AimOffset * aimOffsetLerp);
+    }
+
+    /// <summary>
+    /// Zoom Camera In
+    /// </summary>
+    public void ZoomIn()
+    {
+        // If Zoom Is Over Threshold...
+        if (camera.fieldOfView <= zoomMax)
+            return;
+
+        camera.fieldOfView = Mathf.Min(zoomMin, camera.fieldOfView - Time.deltaTime * zoomSpeed);
+    }
+
+    /// <summary>
+    /// Zoom Camera Out
+    /// </summary>
+    public void ZoomOut()
+    {
+        // If Zoom Is Under Threshold...
+        if (camera.fieldOfView >= zoomMin)
+            return;
+
+        camera.fieldOfView = Mathf.Max(zoomMax, camera.fieldOfView + Time.deltaTime * zoomSpeed);
+    }
+
+    /// <summary>
+    /// Increase Aim Offset Influence
+    /// </summary>
+    public void IncreaseAimOffset() =>
+        aimOffsetLerp = Mathf.Min(aimOffsetLerp + Time.deltaTime * aimOffsetSpeed, 1);
+
+    /// <summary>
+    /// Decrease Aim Offset Influence
+    /// </summary>
+    public void DecreaseAimOffset() =>
+        aimOffsetLerp = Mathf.Max(aimOffsetLerp - Time.deltaTime * aimOffsetSpeed, 0);
+
+    /// <summary>
+    /// Change Between Camera Vertical Angles
+    /// </summary>
+    /// <param name="verticalAngles"> Camera Vertical Angles </param>
+    public void SetVerticalAngles(CameraVerticalAngles verticalAngles)
+    {
+        VerticalAngles = verticalAngles;
+
+        if (verticalAngles == CameraVerticalAngles.Alien)
+        {
+            minVerticalAngle = 0;
+            maxVerticalAngle = 45;
+        }
+        else if (verticalAngles == CameraVerticalAngles.Human)
+        {
+            minVerticalAngle = -30;
+            maxVerticalAngle = 45;
+        }
     }
 }

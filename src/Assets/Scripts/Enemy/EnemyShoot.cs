@@ -39,9 +39,19 @@ public class EnemyShoot : MonoBehaviour
     private Transform gunTip;
 
     /// <summary>
+    /// Camera Follow Player Component
+    /// </summary>
+    private FollowPlayer followPlayer;
+
+    /// <summary>
     /// Aim Rig Component
     /// </summary>
     private Rig aimRig;
+
+    /// <summary>
+    /// Aim Rig Component
+    /// </summary>
+    private Rig playerAimRig;
 
     /// <summary>
     /// Body Walk Constraint Component
@@ -82,6 +92,12 @@ public class EnemyShoot : MonoBehaviour
     /// </summary>
     private float shootCounter = 0;
 
+    [SerializeField]
+    /// <summary>
+    /// Target to Aim At When Controlled By Player
+    /// </summary>
+    private Transform playerAimTarget;
+
     /// <summary>
     /// Called Before First Frame Update
     /// </summary>
@@ -93,6 +109,7 @@ public class EnemyShoot : MonoBehaviour
         suspicion = GetComponent<EnemySuspicion>();
         agent = GetComponent<NavMeshAgent>();
         movement = GetComponent<Movement>();
+        followPlayer = Camera.main.gameObject.GetComponent<FollowPlayer>();
 
         gunLayerIndex = animator.GetLayerIndex("Pistol Layer");
 
@@ -107,14 +124,6 @@ public class EnemyShoot : MonoBehaviour
         bodyData.Add(new WeightedTransform(player.transform, 1));
         bodyConstraint.data.sourceObjects = bodyData;
 
-        bodyWalkConstraint = aimRig.transform
-            .Find("BodyWalkAim")
-            .GetComponent<MultiAimConstraint>();
-        var bodyWalkData = bodyWalkConstraint.data.sourceObjects;
-        bodyWalkData.Clear();
-        bodyWalkData.Add(new WeightedTransform(player.transform, 1));
-        bodyWalkConstraint.data.sourceObjects = bodyWalkData;
-
         MultiAimConstraint handConstraint = aimRig.transform
             .Find("HandAim")
             .GetComponent<MultiAimConstraint>();
@@ -122,6 +131,25 @@ public class EnemyShoot : MonoBehaviour
         handData.Clear();
         handData.Add(new WeightedTransform(player.transform, 1));
         handConstraint.data.sourceObjects = handData;
+
+        GameObject playerRigGameObject = gameObject.transform.Find("PlayerAimRig").gameObject;
+        playerAimRig = playerRigGameObject.GetComponent<Rig>();
+
+        MultiAimConstraint playerBodyConstraint = playerAimRig.transform
+            .Find("BodyAim")
+            .GetComponent<MultiAimConstraint>();
+        var playerBodyData = playerBodyConstraint.data.sourceObjects;
+        playerBodyData.Clear();
+        playerBodyData.Add(new WeightedTransform(playerAimTarget, 1));
+        playerBodyConstraint.data.sourceObjects = playerBodyData;
+
+        MultiAimConstraint playerHandConstraint = playerAimRig.transform
+            .Find("HandAim")
+            .GetComponent<MultiAimConstraint>();
+        var playerHandData = playerHandConstraint.data.sourceObjects;
+        playerHandData.Clear();
+        playerHandData.Add(new WeightedTransform(playerAimTarget, 1));
+        playerHandConstraint.data.sourceObjects = playerHandData;
 
         GetComponent<RigBuilder>().Build();
     }
@@ -142,6 +170,63 @@ public class EnemyShoot : MonoBehaviour
             }
 
             aimRig.weight -= Time.deltaTime;
+
+            if (Input.GetMouseButton(1))
+            {
+                playerAimRig.weight += Time.deltaTime;
+
+                movement.turnOnMove = false;
+
+                followPlayer.ZoomIn();
+                followPlayer.IncreaseAimOffset();
+
+                Vector3 directionToCamera =
+                    (transform.position + Camera.main.transform.rotation * followPlayer.AimOffset)
+                    - Camera.main.transform.position;
+                directionToCamera.y = 0;
+                directionToCamera = directionToCamera.normalized;
+                Quaternion targetRotation = Quaternion.LookRotation(directionToCamera);
+
+                // Slowly Move Player Rotation to Camera Rotation
+                transform.rotation = Quaternion.Lerp(
+                    transform.rotation,
+                    targetRotation,
+                    5f * Time.deltaTime
+                );
+
+                // Find Spot Where Enemy Should Be Aiming
+                Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
+
+                RaycastHit hit;
+
+                // If Raycast Hits Something...
+                if (Physics.Raycast(ray, out hit, 15f, LayerMask.GetMask("Environment")))
+                {
+                    playerAimTarget.position = hit.point;
+                }
+                else
+                {
+                    playerAimTarget.position = ray.GetPoint(15f);
+                }
+
+                if (Input.GetMouseButtonDown(0))
+                {
+                    var bulletInstance = GameObject.Instantiate(
+                        bullet,
+                        gunTip.position,
+                        gunTip.rotation
+                    );
+                }
+            }
+            else
+            {
+                playerAimRig.weight -= Time.deltaTime;
+
+                movement.turnOnMove = true;
+
+                followPlayer.ZoomOut();
+                followPlayer.DecreaseAimOffset();
+            }
         }
         else
         {
@@ -161,15 +246,6 @@ public class EnemyShoot : MonoBehaviour
                 // Get Velocity from Agent
                 Vector3 velocity = agent.transform.InverseTransformDirection(agent.velocity);
                 float speed = velocity.z;
-
-                if (speed > 2)
-                {
-                    bodyWalkConstraint.weight += Time.deltaTime * 3;
-                }
-                else
-                {
-                    bodyWalkConstraint.weight -= Time.deltaTime * 3;
-                }
 
                 if (suspicion.IsPlayerVisible)
                 {

@@ -35,6 +35,11 @@ public class HostPossession : MonoBehaviour
     private Movement movement;
 
     /// <summary>
+    /// Follow Player Camera Component
+    /// </summary>
+    private FollowPlayer followPlayer;
+
+    /// <summary>
     /// Able to Possess Flag
     /// </summary>
     public bool canPossess = false;
@@ -87,6 +92,7 @@ public class HostPossession : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         movement = GetComponent<Movement>();
         animator = GetComponent<Animator>();
+        followPlayer = Camera.main.gameObject.GetComponent<FollowPlayer>();
 
         // Set Rotation Vector Value
         rotationVector = new Vector3(-90, 0, 0);
@@ -135,19 +141,23 @@ public class HostPossession : MonoBehaviour
         }
         else if (lerp >= 1 && host != null && isPossesing)
         {
+            followPlayer.SetVerticalAngles(CameraVerticalAngles.Human);
+
             EnemySuspicion suspicion = host.GetComponentInParent<EnemySuspicion>();
             suspicion.enabled = false;
 
-            NavMeshAgent agent = host.GetComponentInParent<NavMeshAgent>();
+            GameObject enemy = suspicion.gameObject;
+
+            NavMeshAgent agent = enemy.GetComponent<NavMeshAgent>();
             agent.enabled = false;
 
-            Movement movement = host.GetComponentInParent<Movement>();
+            Movement movement = enemy.GetComponent<Movement>();
             movement.enabled = true;
 
-            CapsuleCollider collider = host.GetComponentInParent<CapsuleCollider>();
+            CapsuleCollider collider = enemy.GetComponent<CapsuleCollider>();
             collider.enabled = true;
 
-            Rigidbody hostRigidbody = host.GetComponentInParent<Rigidbody>();
+            Rigidbody hostRigidbody = enemy.GetComponent<Rigidbody>();
             hostRigidbody.freezeRotation = true;
             hostRigidbody.isKinematic = false;
             hostRigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;

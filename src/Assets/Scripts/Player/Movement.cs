@@ -38,6 +38,11 @@ public class Movement : MonoBehaviour
     private float groundDrag = 5f;
 
     /// <summary>
+    /// Flag to Make Entity Turn On Movement
+    /// </summary>
+    public bool turnOnMove = true;
+
+    /// <summary>
     /// Called Before First Frame Update
     /// </summary>
     private void Start()
@@ -63,7 +68,7 @@ public class Movement : MonoBehaviour
         Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
 
         // If Length of Vector Indicates We're Moving...
-        if (direction.magnitude >= 0.1f)
+        if (direction.magnitude >= 0.1f && turnOnMove)
         {
             // TODO: Calculate the target rotation based on the camera's forward direction
             float targetAngle =
