@@ -11,10 +11,19 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Options.unity
     guid: 6d3b0b71dfb90bc4788038ec867e4ce8
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Level1Demo.unity
     guid: 00c994d68c560874bb53ffc0757d968e
   - enabled: 1
     path: Assets/Scenes/LoseScene.unity
     guid: 85e5201de420f854399c179b9d448727
+  - enabled: 1
+    path: Assets/Scenes/level1.unity
+    guid: 4cc814b3647787d479dfbbc1dee3821f
+  - enabled: 1
+    path: Assets/Scenes/level2.unity
+    guid: df9734e73d4274242a1f3bdfe9079ab0
+  - enabled: 1
+    path: Assets/Scenes/Level3.unity
+    guid: 7e81be045ce9f3640ace118750140985
   m_configObjects: {}

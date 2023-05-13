@@ -21,7 +21,7 @@ public class LoadScenes : MonoBehaviour
 
     public void LoadLevel1()
     {
-        SceneManager.LoadScene("Level1Demo");
+        SceneManager.LoadScene("level1");
     }
 
     public void LoadOptions()

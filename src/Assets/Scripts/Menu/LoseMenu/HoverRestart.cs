@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class HoverOptions : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class HoverRestart : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
      private Animator animatorReference;
 
@@ -16,7 +16,7 @@ public class HoverOptions : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     {
        //animatorReference = GameObject.FindGameObjectWithTag("HoverStartGameExtended").GetComponent<Animator>();
        
-       animator = GameObject.FindGameObjectWithTag("HoverOptions").GetComponent<Animator>();
+       animator = GameObject.FindGameObjectWithTag("HoverRestart").GetComponent<Animator>();
 
     
     }
@@ -27,7 +27,7 @@ public class HoverOptions : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         //{
           
             
-            animator.SetBool("Hover", true);
+            animator.SetBool("HoverRestart", true);
         //}
     }
 
@@ -36,7 +36,7 @@ public class HoverOptions : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         //if (isLocked)
         //{
       
-            animator.SetBool("Hover", false);
+            animator.SetBool("HoverRestart", false);
            
             
         // }

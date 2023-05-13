@@ -5,10 +5,13 @@ using UnityEngine;
 public class AnimationEvents : MonoBehaviour
 {
 
+     public Animator animator;
+
     public void PingPong()
     {
     
     }
+
 
     
     // Start is called before the first frame update
