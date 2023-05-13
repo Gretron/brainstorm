@@ -21,6 +21,7 @@ public class PlayerHealth : MonoBehaviour
     {
         if (other.gameObject.tag == "Bullet")
         {
+            Debug.Log("takedmg");
             GameManager.Instance.TakePlayerDamage(-other.gameObject.GetComponent<Bullet>().Damage);
         }
     }

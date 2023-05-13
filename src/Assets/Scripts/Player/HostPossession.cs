@@ -151,6 +151,11 @@ public class HostPossession : MonoBehaviour
             boxCollider.isTrigger = true;
 
             movement.enabled = false;
+
+            if (GameManager.Instance.BrainPower >= 20)
+            {
+                GameManager.Instance.UseBrainPower(-20);
+            }
         }
 
         if (lerp > 0 && !isPossessing && !isPossessed)
@@ -211,6 +216,9 @@ public class HostPossession : MonoBehaviour
 
             hostHealth = enemy.GetComponent<EnemyHealth>();
             EnemyShoot shoot = enemy.GetComponent<EnemyShoot>();
+            EnemyAssassination enemyAssassination = enemy.GetComponent<EnemyAssassination>();
+            GameManager.Instance.hostAssassination = enemyAssassination;
+            GameManager.Instance.hostSuspicion = suspicion;
             GameManager.Instance.hostHealth = hostHealth;
             GameManager.Instance.hostShoot = shoot;
 
@@ -225,6 +233,11 @@ public class HostPossession : MonoBehaviour
             {
                 hostHealth.TakeDamage(100);
                 Unpossess();
+
+                if (GameManager.Instance.BrainPower >= 30)
+                {
+                    GameManager.Instance.UseBrainPower(-30);
+                }
             }
         }
     }

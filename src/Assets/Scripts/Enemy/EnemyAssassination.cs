@@ -34,6 +34,11 @@ public class EnemyAssassination : MonoBehaviour
     private bool isAnimating = false;
 
     /// <summary>
+    /// Has Syringe Flag
+    /// </summary>
+    public bool hasSyringe = true;
+
+    /// <summary>
     /// Called Before First Frame Update
     /// </summary>
     void Start()
@@ -77,6 +82,7 @@ public class EnemyAssassination : MonoBehaviour
                 if (isAnimating)
                 {
                     GetComponent<Movement>().enabled = true;
+                    hasSyringe = false;
                     isAssassinating = false;
 
                     target.GetComponent<EnemyHealth>().TakeDamage(100);
@@ -85,6 +91,11 @@ public class EnemyAssassination : MonoBehaviour
         }
         else
         {
+            if (!hasSyringe)
+            {
+                return;
+            }
+
             // Get Enemies Within Range
             Collider[] hitColliders = Physics.OverlapSphere(
                 transform.position,
