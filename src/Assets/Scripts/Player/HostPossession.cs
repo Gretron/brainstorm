@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Events;
+using UnityEngine.Animations.Rigging;
 
 /// <summary>
 /// Host Possession Behaviour
@@ -30,9 +31,9 @@ public class HostPossession : MonoBehaviour
     private Rigidbody rb;
 
     /// <summary>
-    /// Player Animator
+    /// Player Box Collider
     /// </summary>
-    private Animator animator;
+    private BoxCollider boxCollider;
 
     /// <summary>
     /// Player Movement Component
@@ -57,7 +58,7 @@ public class HostPossession : MonoBehaviour
     /// <summary>
     /// Possession Progress Lerp Value
     /// </summary>
-    public float lerp = 1;
+    public float lerp = 0;
 
     /// <summary>
     /// Player Old Position
@@ -85,6 +86,16 @@ public class HostPossession : MonoBehaviour
     private Vector3 rotationVector;
 
     /// <summary>
+    /// Latch Rig Component
+    /// </summary>
+    private Rig latchRig;
+
+    /// <summary>
+    /// Walking Rig Component
+    /// </summary>
+    private Rig walkingRig;
+
+    /// <summary>
     /// Currently Possessing Flag
     /// </summary>
     public bool isPossesing = false;
@@ -106,8 +117,14 @@ public class HostPossession : MonoBehaviour
         // Get References
         rb = GetComponent<Rigidbody>();
         movement = GetComponent<Movement>();
-        animator = GetComponent<Animator>();
+        boxCollider = GetComponent<BoxCollider>();
         followPlayer = Camera.main.gameObject.GetComponent<FollowPlayer>();
+
+        GameObject latchGameObject = gameObject.transform.Find("LatchRig").gameObject;
+        latchRig = latchGameObject.GetComponent<Rig>();
+
+        GameObject walkingGameObject = gameObject.transform.Find("WalkingRig").gameObject;
+        walkingRig = walkingGameObject.GetComponent<Rig>();
 
         // Set Rotation Vector Value
         rotationVector = new Vector3(-90, 0, 0);
@@ -131,14 +148,22 @@ public class HostPossession : MonoBehaviour
             transform.parent = host.transform;
             oldPosition = transform.localPosition;
             oldRotation = transform.localRotation;
+            boxCollider.isTrigger = true;
 
             movement.enabled = false;
+        }
 
-            animator.SetTrigger("Possession");
+        if (lerp > 0 && host == null)
+        {
+            lerp -= Time.deltaTime;
+
+            // Progressively Latch Off
+            latchRig.weight = lerp;
+            walkingRig.weight = 1 - lerp;
         }
 
         // If Animation Is Not Done and Host Is Not Null...
-        if (lerp < 1 && host != null)
+        if (lerp < 1 && host != null && isPossesing)
         {
             // Lerp Position and Add Sin Wave Bounce
             Vector3 currentPosition = Vector3.Lerp(oldPosition, Vector3.zero, lerp);
@@ -149,10 +174,12 @@ public class HostPossession : MonoBehaviour
             Quaternion rotation = host.transform.localRotation * Quaternion.Euler(rotationVector);
             transform.localRotation = Quaternion.Lerp(oldRotation, rotation, lerp);
 
-            GetComponent<BoxCollider>().isTrigger = true;
-
             // Progress Animation
             lerp += Time.deltaTime;
+
+            // Progressively Latch On
+            latchRig.weight = lerp;
+            walkingRig.weight = 1 - lerp;
         }
         else if (lerp >= 1 && host != null && isPossesing && !isPossessed)
         {
@@ -160,6 +187,11 @@ public class HostPossession : MonoBehaviour
 
             EnemySuspicion suspicion = host.GetComponentInParent<EnemySuspicion>();
             suspicion.enabled = false;
+
+            var assassination = host.GetComponentInParent<EnemyAssassination>();
+
+            if (assassination)
+                assassination.enabled = true;
 
             enemy = suspicion.gameObject;
 
@@ -182,11 +214,12 @@ public class HostPossession : MonoBehaviour
             GameManager.Instance.hostHealth = hostHealth;
             GameManager.Instance.hostShoot = shoot;
 
+            isPossesing = false;
             isPossessed = true;
         }
         else if (isPossessed)
         {
-            hostHealth.TakeDamage(Time.deltaTime * 5);
+            hostHealth.TakeDamage(Time.deltaTime);
         }
     }
 
@@ -195,7 +228,29 @@ public class HostPossession : MonoBehaviour
     /// </summary>
     public void Unpossess()
     {
-        Debug.Log("Host Unpossessed");
+        enemy.GetComponent<Movement>().enabled = false;
+        var assassination = host.GetComponentInParent<EnemyAssassination>();
+        assassination.enabled = false;
+
+        var enemyRigidbody = enemy.GetComponent<Rigidbody>();
+        enemyRigidbody.collisionDetectionMode = CollisionDetectionMode.Discrete;
+        enemyRigidbody.isKinematic = true;
+
+        host = null;
+        enemy = null;
+        //lerp = 0;
+        // newPosition = host.transform.position;
+        rb.isKinematic = false;
+        rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+        transform.parent = null;
+        boxCollider.isTrigger = false;
+        // oldPosition = transform.localPosition;
+        // oldRotation = transform.localRotation;
+
+        movement.enabled = true;
+
+        isPossesing = false;
+        isPossessed = false;
     }
 
     private void OnTriggerStay(Collider other)

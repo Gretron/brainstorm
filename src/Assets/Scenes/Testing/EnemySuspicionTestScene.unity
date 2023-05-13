@@ -636,7 +636,7 @@ GameObject:
   - component: {fileID: 418712753}
   - component: {fileID: 418712752}
   - component: {fileID: 418712751}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube (8)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -934,7 +934,7 @@ GameObject:
   - component: {fileID: 502947065}
   - component: {fileID: 502947064}
   - component: {fileID: 502947063}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube (9)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1029,7 +1029,7 @@ GameObject:
   - component: {fileID: 631925106}
   - component: {fileID: 631925105}
   - component: {fileID: 631925104}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1190,7 +1190,7 @@ GameObject:
   - component: {fileID: 746076763}
   - component: {fileID: 746076762}
   - component: {fileID: 746076761}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1285,7 +1285,7 @@ GameObject:
   - component: {fileID: 749789421}
   - component: {fileID: 749789420}
   - component: {fileID: 749789419}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube (6)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1410,7 +1410,7 @@ GameObject:
   - component: {fileID: 939022194}
   - component: {fileID: 939022193}
   - component: {fileID: 939022192}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1643,7 +1643,7 @@ GameObject:
   - component: {fileID: 1140611118}
   - component: {fileID: 1140611117}
   - component: {fileID: 1140611116}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1738,7 +1738,7 @@ GameObject:
   - component: {fileID: 1170846046}
   - component: {fileID: 1170846045}
   - component: {fileID: 1170846044}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1972,6 +1972,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Hand
       objectReference: {fileID: 0}
+    - target: {fileID: 6241051436620877284, guid: 7b9bbc94e590b5146bebf61e5a37e127, type: 3}
+      propertyPath: lerp
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7387076281707794205, guid: 7b9bbc94e590b5146bebf61e5a37e127, type: 3}
       propertyPath: m_RootOrder
       value: 1
@@ -1982,7 +1986,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7387076281707794205, guid: 7b9bbc94e590b5146bebf61e5a37e127, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.341
+      value: 0.831
       objectReference: {fileID: 0}
     - target: {fileID: 7387076281707794205, guid: 7b9bbc94e590b5146bebf61e5a37e127, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2241,7 +2245,7 @@ GameObject:
   - component: {fileID: 1510191772}
   - component: {fileID: 1510191771}
   - component: {fileID: 1510191770}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2552,7 +2556,7 @@ GameObject:
   - component: {fileID: 1695682774}
   - component: {fileID: 1695682773}
   - component: {fileID: 1695682772}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2647,7 +2651,7 @@ GameObject:
   - component: {fileID: 1744683898}
   - component: {fileID: 1744683897}
   - component: {fileID: 1744683896}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2742,7 +2746,7 @@ GameObject:
   - component: {fileID: 1812232412}
   - component: {fileID: 1812232411}
   - component: {fileID: 1812232410}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube (7)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3025,7 +3029,7 @@ GameObject:
   - component: {fileID: 1947336333}
   - component: {fileID: 1947336332}
   - component: {fileID: 1947336331}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube (5)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3108,6 +3112,23 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 16
   m_LocalEulerAnglesHint: {x: 0, y: -180, z: 0}
+--- !u!1 &2004290450 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8325141839649939805, guid: 3bb5879a6c681de42bd5bac4244d2dd1, type: 3}
+  m_PrefabInstance: {fileID: 9172057506984994909}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2004290451
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2004290450}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49cfc6b9baf52bc4ab954374a12bf051, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &2040825780
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3173,6 +3194,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 67508504df23a9e458327a20d7484568, type: 3}
+--- !u!114 &2073561356 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9172057506937667004, guid: 3bb5879a6c681de42bd5bac4244d2dd1, type: 3}
+  m_PrefabInstance: {fileID: 9172057506984994909}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70b342d8ce5c2fd48b8fa3147d48d1d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2082718349
 GameObject:
   m_ObjectHideFlags: 0
@@ -3276,6 +3308,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2305094129729508163, guid: 6db84f9c8f572884d8052a1df377247b, type: 3}
+      propertyPath: m_TagString
+      value: Enemy
+      objectReference: {fileID: 0}
     - target: {fileID: 2305094129729508184, guid: 6db84f9c8f572884d8052a1df377247b, type: 3}
       propertyPath: maxDistance
       value: 10
@@ -3366,6 +3402,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Scientist
       objectReference: {fileID: 0}
+    - target: {fileID: 8325141839649939805, guid: 3bb5879a6c681de42bd5bac4244d2dd1, type: 3}
+      propertyPath: m_TagString
+      value: Enemy
+      objectReference: {fileID: 0}
     - target: {fileID: 8701808566868376551, guid: 3bb5879a6c681de42bd5bac4244d2dd1, type: 3}
       propertyPath: m_RootOrder
       value: 3
@@ -3410,6 +3450,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 9172057504951488014, guid: 3bb5879a6c681de42bd5bac4244d2dd1, type: 3}
+      propertyPath: m_RigLayers.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9172057504951488014, guid: 3bb5879a6c681de42bd5bac4244d2dd1, type: 3}
+      propertyPath: m_RigLayers.Array.data[1].m_Rig
+      value: 
+      objectReference: {fileID: 2073561356}
     - target: {fileID: 9172057506321455697, guid: 3bb5879a6c681de42bd5bac4244d2dd1, type: 3}
       propertyPath: m_Data.m_SourceObjects.m_Item0.transform
       value: 
