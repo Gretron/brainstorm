@@ -103,15 +103,6 @@ public class EnemyAssassination : MonoBehaviour
                 }
             }
 
-            if (target == null)
-            {
-                Debug.Log("No");
-            }
-            else
-            {
-                Debug.Log(target.name);
-            }
-
             // If Player Presses R
             if (Input.GetKeyDown(KeyCode.R) && target != null)
             {

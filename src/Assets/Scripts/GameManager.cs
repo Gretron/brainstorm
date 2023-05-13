@@ -49,6 +49,12 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private Slider gunSlider;
 
+    [SerializeField]
+    /// <summary>
+    /// Enemy Gun Icon
+    /// </summary>
+    private GameObject gunIcon;
+
     /// <summary>
     /// Health of Current Host
     /// </summary>
@@ -93,6 +99,7 @@ public class GameManager : MonoBehaviour
             healthSlider = GameObject.Find("HealthSlider").GetComponent<Slider>();
             brainPowerSlider = GameObject.Find("BrainPowerSlider").GetComponent<Slider>();
             hostHealthSlider = GameObject.Find("HostHealthSlider").GetComponent<Slider>();
+            gunIcon = GameObject.Find("GunIcon");
             gunSlider = GameObject.Find("GunSlider").GetComponent<Slider>();
         }
     }
@@ -109,11 +116,21 @@ public class GameManager : MonoBehaviour
             hostHealthSlider.maxValue = hostHealth.MaxHealth;
             hostHealthSlider.value = hostHealth.Health;
         }
+        else
+        {
+            hostHealthSlider.value = 0;
+        }
 
-        if (hostShoot)
+        if (hostShoot && hostHealth.Health > 0)
         {
             gunSlider.maxValue = hostShoot.MaxAmmo;
             gunSlider.value = hostShoot.Ammo;
+
+            gunIcon.SetActive(true);
+        }
+        else
+        {
+            gunIcon.SetActive(false);
         }
     }
 
