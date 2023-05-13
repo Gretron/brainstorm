@@ -188,6 +188,11 @@ public class HostPossession : MonoBehaviour
             EnemySuspicion suspicion = host.GetComponentInParent<EnemySuspicion>();
             suspicion.enabled = false;
 
+            var assassination = host.GetComponentInParent<EnemyAssassination>();
+
+            if (assassination)
+                assassination.enabled = true;
+
             enemy = suspicion.gameObject;
 
             NavMeshAgent agent = enemy.GetComponent<NavMeshAgent>();
@@ -214,7 +219,7 @@ public class HostPossession : MonoBehaviour
         }
         else if (isPossessed)
         {
-            hostHealth.TakeDamage(Time.deltaTime * 5);
+            hostHealth.TakeDamage(Time.deltaTime);
         }
     }
 
@@ -224,6 +229,8 @@ public class HostPossession : MonoBehaviour
     public void Unpossess()
     {
         enemy.GetComponent<Movement>().enabled = false;
+        var assassination = host.GetComponentInParent<EnemyAssassination>();
+        assassination.enabled = false;
 
         var enemyRigidbody = enemy.GetComponent<Rigidbody>();
         enemyRigidbody.collisionDetectionMode = CollisionDetectionMode.Discrete;
