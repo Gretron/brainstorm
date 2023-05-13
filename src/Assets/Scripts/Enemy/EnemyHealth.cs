@@ -117,6 +117,7 @@ public class EnemyHealth : MonoBehaviour
             if (possession.isPossessed && GameObject.ReferenceEquals(gameObject, possession.enemy))
             {
                 possession.Unpossess();
+                GameManager.Instance.hostHealth = null;
             }
         }
     }

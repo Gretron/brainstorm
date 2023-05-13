@@ -98,7 +98,7 @@ public class HostPossession : MonoBehaviour
     /// <summary>
     /// Currently Possessing Flag
     /// </summary>
-    public bool isPossesing = false;
+    public bool isPossessing = false;
 
     /// <summary>
     /// Currently Possessed Flag
@@ -136,13 +136,13 @@ public class HostPossession : MonoBehaviour
     void Update()
     {
         // If Able to Possess and Presses Possess Key...
-        if (canPossess && Input.GetKeyDown(KeyCode.F))
+        if (canPossess && Input.GetKeyDown(KeyCode.F) && !isPossessed)
         {
             hostPossession.Invoke();
 
             lerp = 0;
             newPosition = host.transform.position;
-            isPossesing = true;
+            isPossessing = true;
             rb.collisionDetectionMode = CollisionDetectionMode.Discrete;
             rb.isKinematic = true;
             transform.parent = host.transform;
@@ -153,7 +153,7 @@ public class HostPossession : MonoBehaviour
             movement.enabled = false;
         }
 
-        if (lerp > 0 && host == null)
+        if (lerp > 0 && !isPossessing && !isPossessed)
         {
             lerp -= Time.deltaTime;
 
@@ -163,7 +163,7 @@ public class HostPossession : MonoBehaviour
         }
 
         // If Animation Is Not Done and Host Is Not Null...
-        if (lerp < 1 && host != null && isPossesing)
+        if (lerp < 1 && host != null && isPossessing)
         {
             // Lerp Position and Add Sin Wave Bounce
             Vector3 currentPosition = Vector3.Lerp(oldPosition, Vector3.zero, lerp);
@@ -181,7 +181,7 @@ public class HostPossession : MonoBehaviour
             latchRig.weight = lerp;
             walkingRig.weight = 1 - lerp;
         }
-        else if (lerp >= 1 && host != null && isPossesing && !isPossessed)
+        else if (lerp >= 1 && host != null && isPossessing && !isPossessed)
         {
             followPlayer.SetVerticalAngles(CameraVerticalAngles.Human);
 
@@ -214,12 +214,18 @@ public class HostPossession : MonoBehaviour
             GameManager.Instance.hostHealth = hostHealth;
             GameManager.Instance.hostShoot = shoot;
 
-            isPossesing = false;
+            isPossessing = false;
             isPossessed = true;
         }
         else if (isPossessed)
         {
             hostHealth.TakeDamage(Time.deltaTime);
+
+            if (Input.GetKeyDown(KeyCode.F))
+            {
+                hostHealth.TakeDamage(100);
+                Unpossess();
+            }
         }
     }
 
@@ -230,7 +236,9 @@ public class HostPossession : MonoBehaviour
     {
         enemy.GetComponent<Movement>().enabled = false;
         var assassination = host.GetComponentInParent<EnemyAssassination>();
-        assassination.enabled = false;
+
+        if (assassination)
+            assassination.enabled = false;
 
         var enemyRigidbody = enemy.GetComponent<Rigidbody>();
         enemyRigidbody.collisionDetectionMode = CollisionDetectionMode.Discrete;
@@ -238,7 +246,8 @@ public class HostPossession : MonoBehaviour
 
         host = null;
         enemy = null;
-        //lerp = 0;
+
+        lerp = 1;
         // newPosition = host.transform.position;
         rb.isKinematic = false;
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
@@ -249,13 +258,13 @@ public class HostPossession : MonoBehaviour
 
         movement.enabled = true;
 
-        isPossesing = false;
+        isPossessing = false;
         isPossessed = false;
     }
 
     private void OnTriggerStay(Collider other)
     {
-        if (other.tag == "Possession" && !isPossesing)
+        if (other.tag == "Possession" && !isPossessing)
         {
             canPossess = true;
             host = other.gameObject;
@@ -264,11 +273,11 @@ public class HostPossession : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.tag == "Possession" && !isPossesing)
+        if (other.tag == "Possession" && !isPossessing)
         {
             canPossess = false;
 
-            if (!isPossesing)
+            if (!isPossessing)
                 host = null;
         }
     }
