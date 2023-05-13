@@ -10,7 +10,14 @@ TagManager:
   - Possession
   - Floor
   - Bullet
+<<<<<<< Updated upstream
   - Enemy
+=======
+  - HoverStartGame
+  - HoverStartGameExtended
+  - HoverOptions
+  - HoverQuit
+>>>>>>> Stashed changes
   layers:
   - Default
   - TransparentFX

@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class HoverMenu : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class HoverOptions : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
      private Animator animatorReference;
 
@@ -13,8 +13,7 @@ public class HoverMenu : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 
     public static bool isLocked;
     // private Color originalColor;
-    private Animator animatorStart;
-    private Animator animatorOptions;
+    private Animator animator;
     // RectTransform rectTransform;
     // public Image image;
     // float width = 1;
@@ -23,8 +22,7 @@ public class HoverMenu : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     {
        //animatorReference = GameObject.FindGameObjectWithTag("HoverStartGameExtended").GetComponent<Animator>();
        
-       animatorStart = GameObject.FindGameObjectWithTag("HoverStartGame").GetComponent<Animator>();
-       animatorOptions = GameObject.FindGameObjectWithTag("HoverOptions").GetComponent<Animator>();
+       animator = GameObject.FindGameObjectWithTag("HoverOptions").GetComponent<Animator>();
 
     
     }
@@ -35,8 +33,7 @@ public class HoverMenu : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         //{
           
             
-            animatorStart.SetBool("MainHover", true);
-            animatorOptions.SetBool("Hover", true);
+            animator.SetBool("Hover", true);
         //}
     }
 
@@ -45,8 +42,7 @@ public class HoverMenu : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         //if (isLocked)
         //{
       
-            animatorStart.SetBool("MainHover", false);
-            animatorOptions.SetBool("Hover", false);
+            animator.SetBool("Hover", false);
            
             
         // }
