@@ -234,6 +234,8 @@ public class HostPossession : MonoBehaviour
                 hostHealth.TakeDamage(100);
                 Unpossess();
 
+                followPlayer.SetVerticalAngles(CameraVerticalAngles.Alien);
+
                 if (GameManager.Instance.BrainPower >= 30)
                 {
                     GameManager.Instance.UseBrainPower(-30);
