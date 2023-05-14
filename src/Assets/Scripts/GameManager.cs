@@ -114,8 +114,8 @@ public class GameManager : MonoBehaviour
         // If Instance Is Missing...
         if (Instance == null)
         {
-            Debug.Log("Not");
-            DontDestroyOnLoad(gameObject);
+            
+            //DontDestroyOnLoad(gameObject);
             Instance = this;
 
             // If Terminal Alert Event Is Null...
@@ -221,10 +221,9 @@ public class GameManager : MonoBehaviour
 
         if (healthSlider.value <= healthSlider.minValue)
         {
-                pause.TogglePause();
+                
                 SceneManager.LoadScene("LoseScene", LoadSceneMode.Single);
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
+               
 
         }
     }

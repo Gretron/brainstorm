@@ -6,11 +6,15 @@ using UnityEngine.SceneManagement;
 public class LoadScenes : MonoBehaviour
 {
     string currentSceneName;
+    int lastSceneIndex;
 
     void Start()
     {
+
+lastSceneIndex = PlayerPrefs.GetInt("lastSceneIndex");
         currentSceneName = SceneManager.GetActiveScene().name;
 
+        
     }
 
     void Update()
@@ -21,6 +25,12 @@ public class LoadScenes : MonoBehaviour
     public void LoadLevel1()
     {
         SceneManager.LoadScene("level1");
+    }
+
+    public void Back()
+    {
+        
+        SceneManager.LoadScene(lastSceneIndex);
     }
 
     public void LoadOptions()
@@ -42,20 +52,14 @@ public class LoadScenes : MonoBehaviour
     public void LoadRestart()
     {
 
-         if(currentSceneName == "level1"){
+        SceneManager.LoadScene(lastSceneIndex);
             
-            SceneManager.LoadScene("level1");
-         }
+    }
 
-         if(currentSceneName == "level2"){
-            
-            SceneManager.LoadScene("level2");
-         }
-
-         if(currentSceneName == "Level3"){
-            
-            SceneManager.LoadScene("Level3");
-         }
-            
+       private void OnDestroy()
+    {
+        // Save the build index of the current scene before switching to the next scene
+        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        PlayerPrefs.SetInt("lastSceneIndex", currentSceneIndex);
     }
 }

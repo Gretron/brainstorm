@@ -42,6 +42,9 @@ public class PauseMenu : MonoBehaviour
         pauseMenuPanel.SetActive(false);
         follow.SetPaused(false);
         overlayCanvas.enabled = false; 
+
+        // Cursor.lockState = CursorLockMode.Locked;
+        //     Cursor.visible = false;
         }
     }
 
