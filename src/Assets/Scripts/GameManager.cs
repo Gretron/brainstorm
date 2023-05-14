@@ -223,7 +223,8 @@ public class GameManager : MonoBehaviour
         {
                 
                 SceneManager.LoadScene("LoseScene", LoadSceneMode.Single);
-               
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
 
         }
     }
