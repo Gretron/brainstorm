@@ -2,27 +2,21 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class HoverStartGame : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class ResumeHover : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
      private Animator animatorReference;
 
-    // public Image imageToAppear;
-    // public Image imageToAppear2;
-    // public Color hoverColor;
-    // public Color emptyColor = new Color(1f, 1f, 1f, 0f);
 
     public static bool isLocked;
-    // private Color originalColor;
+
     private Animator animator;
-    // RectTransform rectTransform;
-    // public Image image;
-    // float width = 1;
+
 
     private void Start()
     {
        //animatorReference = GameObject.FindGameObjectWithTag("HoverStartGameExtended").GetComponent<Animator>();
        
-       animator = GameObject.FindGameObjectWithTag("HoverStartGame").GetComponent<Animator>();
+       animator = GameObject.FindGameObjectWithTag("HoverResume").GetComponent<Animator>();
 
     
     }
@@ -32,8 +26,8 @@ public class HoverStartGame : MonoBehaviour, IPointerEnterHandler, IPointerExitH
        // if (!isLocked)
         //{
           
-            Debug.Log("HI");
-            animator.SetBool("MainHover", true);
+            
+            animator.SetBool("ResumeTrigger", true);
         //}
     }
 
@@ -42,7 +36,7 @@ public class HoverStartGame : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         //if (isLocked)
         //{
       
-            animator.SetBool("MainHover", false);
+            animator.SetBool("ResumeTrigger", false);
            
             
         // }
@@ -56,15 +50,12 @@ public class HoverStartGame : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     public void OnButtonClick()
     {
-        
         //isLocked = false;
 
        //animatorStart.SetBool("MainHover", true);
      //animatorOptions.SetBool("Hover", true);
       
     }
-
-    
 
 
 }

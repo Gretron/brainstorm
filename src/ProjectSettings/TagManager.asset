@@ -16,6 +16,7 @@ TagManager:
   - HoverQuit
   - HoverRestart
   - HoverQuitLose
+  - HoverResume
   layers:
   - Default
   - TransparentFX

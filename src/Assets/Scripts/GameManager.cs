@@ -102,15 +102,19 @@ public class GameManager : MonoBehaviour
     {
         get { return brainPowerSlider.value; }
     }
+  
+  PauseMenu pause;
 
     /// <summary>
     /// Called When Script Instance Is Loaded
     /// </summary>
     void Awake()
     {
+        
         // If Instance Is Missing...
         if (Instance == null)
         {
+            Debug.Log("Not");
             DontDestroyOnLoad(gameObject);
             Instance = this;
 
@@ -122,7 +126,9 @@ public class GameManager : MonoBehaviour
         }
         else
         {
+            Debug.Log("Instance is missing");
             Destroy(gameObject);
+            
         }
     }
 
@@ -131,6 +137,8 @@ public class GameManager : MonoBehaviour
     /// </summary>
     void Start()
     {
+        pause = GetComponent<PauseMenu>();
+        Time.timeScale = 1f;
         if (SceneManager.GetActiveScene().name != "MainMenu")
         {
             player = GameObject.FindGameObjectWithTag("Player");
@@ -150,6 +158,9 @@ public class GameManager : MonoBehaviour
     /// </summary>
     void Update()
     {
+
+    GUI.SetActive(true);
+           
         if (hostHealth && hostHealth.Health > 0)
         {
             brainPowerSlider.value += Time.deltaTime;
@@ -210,7 +221,11 @@ public class GameManager : MonoBehaviour
 
         if (healthSlider.value <= healthSlider.minValue)
         {
-            SceneManager.LoadScene("LoseScene", LoadSceneMode.Single);
+                pause.TogglePause();
+                SceneManager.LoadScene("LoseScene", LoadSceneMode.Single);
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+
         }
     }
 

@@ -5,12 +5,11 @@ using UnityEngine.SceneManagement;
 
 public class LoadScenes : MonoBehaviour
 {
-    string sceneName;
-    string currentScene;
+    string currentSceneName;
 
     void Start()
     {
-        
+        currentSceneName = SceneManager.GetActiveScene().name;
 
     }
 
@@ -43,13 +42,20 @@ public class LoadScenes : MonoBehaviour
     public void LoadRestart()
     {
 
-    //    currentScene = GameManager.Instance.getCurrentScene();
-
-        
-    //      if(currentScene == "Level1"){
+         if(currentSceneName == "level1"){
             
-    //         SceneManager.LoadScene("Level1");
-    //      }
+            SceneManager.LoadScene("level1");
+         }
+
+         if(currentSceneName == "level2"){
+            
+            SceneManager.LoadScene("level2");
+         }
+
+         if(currentSceneName == "Level3"){
+            
+            SceneManager.LoadScene("Level3");
+         }
             
     }
 }
