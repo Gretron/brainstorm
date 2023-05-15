@@ -44,7 +44,5 @@ public class SuspicionMeter : AnimatableImage
         {
             Play(spottedAnimation, es.CuriousCounter, es.CuriousThreshold);
         }
-
-        transform.parent.transform.LookAt(Camera.main.transform);
     }
 }

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 using UnityEngine.Events;
 using UnityEngine.Animations.Rigging;
 
@@ -76,6 +77,11 @@ public class HostPossession : MonoBehaviour
     public Quaternion oldRotation;
 
     /// <summary>
+    /// Kill Indicator Image
+    /// </summary>
+    private Image KillIndicator;
+
+    /// <summary>
     /// Player New Host Rotation
     /// </summary>
     public Quaternion newRotation;
@@ -105,6 +111,27 @@ public class HostPossession : MonoBehaviour
     /// </summary>
     public bool isPossessed = false;
 
+    [SerializeField]
+    /// <summary>
+    /// Can Assassinate Flag
+    /// </summary>
+    private bool canAssassinate = true;
+
+    /// <summary>
+    /// Possession Indicator
+    /// </summary>
+    private Image possessionIndicator;
+
+    /// <summary>
+    /// Enemy Suspicion Behaviour
+    /// </summary>
+    private EnemySuspicion suspicion;
+
+    /// <summary>
+    /// Main Exit Reference
+    /// </summary>
+    private GameObject exit;
+
     /// <summary>
     /// Called Before First Frame Update
     /// </summary>
@@ -119,6 +146,8 @@ public class HostPossession : MonoBehaviour
         movement = GetComponent<Movement>();
         boxCollider = GetComponent<BoxCollider>();
         followPlayer = Camera.main.gameObject.GetComponent<FollowPlayer>();
+
+        exit = GameObject.FindGameObjectWithTag("Exit");
 
         GameObject latchGameObject = gameObject.transform.Find("LatchRig").gameObject;
         latchRig = latchGameObject.GetComponent<Rig>();
@@ -135,9 +164,16 @@ public class HostPossession : MonoBehaviour
     /// </summary>
     void Update()
     {
+        if (possessionIndicator != null && canPossess && !isPossessing && !isPossessed)
+        {
+            possessionIndicator.enabled = true;
+        }
+
         // If Able to Possess and Presses Possess Key...
         if (canPossess && Input.GetKeyDown(KeyCode.F) && !isPossessed)
         {
+            possessionIndicator.enabled = false;
+
             hostPossession.Invoke();
 
             lerp = 0;
@@ -190,15 +226,17 @@ public class HostPossession : MonoBehaviour
         {
             followPlayer.SetVerticalAngles(CameraVerticalAngles.Human);
 
-            EnemySuspicion suspicion = host.GetComponentInParent<EnemySuspicion>();
-            suspicion.enabled = false;
+            EnemySuspicion enemySuspicion = host.GetComponentInParent<EnemySuspicion>();
+            suspicion = enemySuspicion;
+            enemySuspicion.enabled = false;
 
             var assassination = host.GetComponentInParent<EnemyAssassination>();
 
             if (assassination)
                 assassination.enabled = true;
 
-            enemy = suspicion.gameObject;
+            enemy = enemySuspicion.gameObject;
+            enemy.GetComponentInChildren<SuspicionMeter>().gameObject.SetActive(false);
 
             NavMeshAgent agent = enemy.GetComponent<NavMeshAgent>();
             agent.enabled = false;
@@ -209,6 +247,8 @@ public class HostPossession : MonoBehaviour
             CapsuleCollider collider = enemy.GetComponent<CapsuleCollider>();
             collider.enabled = true;
 
+            KillIndicator = enemy.transform.Find("Canvas/KillIndicator").GetComponent<Image>();
+
             Rigidbody hostRigidbody = enemy.GetComponent<Rigidbody>();
             hostRigidbody.freezeRotation = true;
             hostRigidbody.isKinematic = false;
@@ -218,7 +258,7 @@ public class HostPossession : MonoBehaviour
             EnemyShoot shoot = enemy.GetComponent<EnemyShoot>();
             EnemyAssassination enemyAssassination = enemy.GetComponent<EnemyAssassination>();
             GameManager.Instance.hostAssassination = enemyAssassination;
-            GameManager.Instance.hostSuspicion = suspicion;
+            GameManager.Instance.hostSuspicion = enemySuspicion;
             GameManager.Instance.hostHealth = hostHealth;
             GameManager.Instance.hostShoot = shoot;
 
@@ -227,10 +267,33 @@ public class HostPossession : MonoBehaviour
         }
         else if (isPossessed)
         {
-            hostHealth.TakeDamage(Time.deltaTime);
-
-            if (Input.GetKeyDown(KeyCode.F))
+            if (suspicion.keycardHolder)
             {
+                var hostToExit = enemy.transform.position - exit.transform.position;
+
+                if (hostToExit.sqrMagnitude < 3)
+                {
+                    GameManager.Instance.LoadNextLevel();
+                }
+            }
+
+            hostHealth.TakeDamage(Time.deltaTime * 2);
+
+            if (GameManager.Instance.BrainPower > 30 && canAssassinate)
+            {
+                KillIndicator.enabled = true;
+            }
+            else
+            {
+                KillIndicator.enabled = false;
+            }
+
+            if (Input.GetKeyDown(KeyCode.F) && canAssassinate)
+            {
+                KillIndicator.enabled = false;
+
+                GameManager.Instance.TakePlayerDamage(20);
+
                 hostHealth.TakeDamage(100);
                 Unpossess();
 
@@ -277,6 +340,17 @@ public class HostPossession : MonoBehaviour
         isPossessed = false;
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "Possession" && !isPossessing)
+        {
+            var enemyHost = other.GetComponentInParent<EnemySuspicion>().gameObject;
+            possessionIndicator = enemyHost.transform
+                .Find("Canvas/PossessionIndicator")
+                .GetComponent<Image>();
+        }
+    }
+
     private void OnTriggerStay(Collider other)
     {
         if (other.tag == "Possession" && !isPossessing)
@@ -294,6 +368,8 @@ public class HostPossession : MonoBehaviour
 
             if (!isPossessing)
                 host = null;
+
+            possessionIndicator = null;
         }
     }
 }

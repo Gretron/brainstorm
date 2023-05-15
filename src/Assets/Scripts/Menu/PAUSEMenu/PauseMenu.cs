@@ -29,28 +29,32 @@ public class PauseMenu : MonoBehaviour
         if (isPaused)
         {
             Time.timeScale = 0f;
-        pauseMenuPanel.SetActive(true);
-        follow.SetPaused(true);
-        overlayCanvas.enabled = true; 
-        
-        Cursor.lockState = CursorLockMode.None;
+            pauseMenuPanel.SetActive(true);
+            follow.SetPaused(true);
+            overlayCanvas.enabled = true;
+
+            Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
         }
         else
         {
             Time.timeScale = 1f;
-        pauseMenuPanel.SetActive(false);
-        follow.SetPaused(false);
-        overlayCanvas.enabled = false; 
+            pauseMenuPanel.SetActive(false);
+            follow.SetPaused(false);
+            overlayCanvas.enabled = false;
+            Cursor.lockState = CursorLockMode.Confined;
+            Cursor.visible = false;
 
-        // Cursor.lockState = CursorLockMode.Locked;
-        //     Cursor.visible = false;
+            // Cursor.lockState = CursorLockMode.Locked;
+            //     Cursor.visible = false;
         }
     }
 
     public void Resume()
     {
         TogglePause();
+        Cursor.lockState = CursorLockMode.Confined;
+        Cursor.visible = false;
     }
 
     // private void OnDisable()
@@ -59,4 +63,3 @@ public class PauseMenu : MonoBehaviour
     //     overlayCanvas.enabled = false;
     // }
 }
-

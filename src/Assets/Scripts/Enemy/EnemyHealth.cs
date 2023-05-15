@@ -148,6 +148,8 @@ public class EnemyHealth : MonoBehaviour
     /// </summary>
     void Die()
     {
+        transform.Find("Canvas").gameObject.SetActive(false);
+
         foreach (Rigidbody rb in ragdollBodies)
             rb.isKinematic = false;
 

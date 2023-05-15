@@ -102,19 +102,17 @@ public class GameManager : MonoBehaviour
     {
         get { return brainPowerSlider.value; }
     }
-  
-  PauseMenu pause;
+
+    PauseMenu pause;
 
     /// <summary>
     /// Called When Script Instance Is Loaded
     /// </summary>
     void Awake()
     {
-        
         // If Instance Is Missing...
         if (Instance == null)
         {
-            
             //DontDestroyOnLoad(gameObject);
             Instance = this;
 
@@ -128,7 +126,6 @@ public class GameManager : MonoBehaviour
         {
             Debug.Log("Instance is missing");
             Destroy(gameObject);
-            
         }
     }
 
@@ -158,16 +155,15 @@ public class GameManager : MonoBehaviour
     /// </summary>
     void Update()
     {
+        GUI.SetActive(true);
 
-    GUI.SetActive(true);
-           
         if (hostHealth && hostHealth.Health > 0)
         {
             brainPowerSlider.value += Time.deltaTime;
         }
         else
         {
-            TakePlayerDamage(-Time.deltaTime * 2);
+            TakePlayerDamage(-Time.deltaTime * 1.5f);
         }
 
         if (hostHealth)
@@ -221,11 +217,9 @@ public class GameManager : MonoBehaviour
 
         if (healthSlider.value <= healthSlider.minValue)
         {
-                
-                SceneManager.LoadScene("LoseScene", LoadSceneMode.Single);
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
-
+            SceneManager.LoadScene("LoseScene", LoadSceneMode.Single);
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
     }
 
@@ -236,5 +230,36 @@ public class GameManager : MonoBehaviour
     public void UseBrainPower(float value)
     {
         brainPowerSlider.value += value;
+    }
+
+    public void LoadNextLevel()
+    {
+        var sceneName = SceneManager.GetActiveScene().name;
+
+        if (sceneName.Contains("level"))
+        {
+            var level = int.Parse(sceneName[5].ToString());
+
+            Debug.Log("Level" + level);
+
+            if (level > 2)
+            {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+                SceneManager.LoadScene("WinMenu");
+            }
+            else
+            {
+                SceneManager.LoadScene("level" + ++level);
+            }
+        }
+        else { }
+    }
+
+    public void LoseGame()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        SceneManager.LoadScene("LoseScene");
     }
 }

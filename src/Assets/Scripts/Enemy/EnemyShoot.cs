@@ -269,6 +269,11 @@ public class EnemyShoot : MonoBehaviour
             }
             else if (suspicionState == Suspicion.Curious || suspicionState == Suspicion.Alerted)
             {
+                animator.SetLayerWeight(
+                    gunLayerIndex,
+                    Mathf.Min(animator.GetLayerWeight(gunLayerIndex) + (Time.deltaTime * 5), 1)
+                );
+
                 // Get Velocity from Agent
                 Vector3 velocity = agent.transform.InverseTransformDirection(agent.velocity);
                 float speed = velocity.z;
@@ -299,14 +304,6 @@ public class EnemyShoot : MonoBehaviour
                 else
                 {
                     aimRig.weight -= Time.deltaTime;
-                }
-
-                if (suspicionState == Suspicion.Curious)
-                {
-                    animator.SetLayerWeight(
-                        gunLayerIndex,
-                        Mathf.Min(animator.GetLayerWeight(gunLayerIndex) + (Time.deltaTime * 5), 1)
-                    );
                 }
             }
         }
