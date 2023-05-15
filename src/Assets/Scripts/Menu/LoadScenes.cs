@@ -11,7 +11,6 @@ public class LoadScenes : MonoBehaviour
     void Start()
     {
 
-        lastSceneIndex = PlayerPrefs.GetInt("lastSceneIndex");
         currentSceneName = SceneManager.GetActiveScene().name;
 
         
@@ -30,7 +29,8 @@ public class LoadScenes : MonoBehaviour
     public void Back()
     {
         
-        SceneManager.LoadScene(lastSceneIndex);
+      string lastSceneName = PlayerPrefs.GetString("lastSceneName");
+    SceneManager.LoadScene(lastSceneName);
     }
 
     public void LoadOptions()
@@ -52,14 +52,25 @@ public class LoadScenes : MonoBehaviour
     public void LoadRestart()
     {
 
-        SceneManager.LoadScene(lastSceneIndex);
+      
+    SceneManager.LoadScene(currentSceneName);
+            
+    }
+
+    public void LoadRestartLose()
+    {
+
+      
+   string lastSceneName = PlayerPrefs.GetString("lastSceneName");
+    SceneManager.LoadScene(lastSceneName);
             
     }
 
        private void OnDestroy()
-    {
-        // Save the build index of the current scene before switching to the next scene
-        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        PlayerPrefs.SetInt("lastSceneIndex", currentSceneIndex);
-    }
+{
+    // Save the name of the current scene before switching to the next scene
+    string currentSceneName = SceneManager.GetActiveScene().name;
+    PlayerPrefs.SetString("lastSceneName", currentSceneName);
+}
+
 }
