@@ -11,7 +11,7 @@ public class LoadScenes : MonoBehaviour
     void Start()
     {
 
-lastSceneIndex = PlayerPrefs.GetInt("lastSceneIndex");
+        lastSceneIndex = PlayerPrefs.GetInt("lastSceneIndex");
         currentSceneName = SceneManager.GetActiveScene().name;
 
         
