@@ -17,6 +17,7 @@ TagManager:
   - HoverRestart
   - HoverQuitLose
   - HoverResume
+  - Enemy
   layers:
   - Default
   - TransparentFX
@@ -24,8 +25,8 @@ TagManager:
   - Environment
   - Water
   - UI
-  - 
-  - 
+  - Enemy
+  - Dead
   - 
   - 
   - 

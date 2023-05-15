@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 /// <summary>
 /// Enemy Assassination Behaviour
@@ -24,6 +25,11 @@ public class EnemyAssassination : MonoBehaviour
     private GameObject target;
 
     /// <summary>
+    /// Last Assassination Target
+    /// </summary>
+    private GameObject lastTarget;
+
+    /// <summary>
     /// Is Assassinating Flag
     /// </summary>
     private bool isAssassinating;
@@ -39,10 +45,16 @@ public class EnemyAssassination : MonoBehaviour
     public bool hasSyringe = true;
 
     /// <summary>
+    /// Player Host Possession
+    /// </summary>
+    private HostPossession possession;
+
+    /// <summary>
     /// Called Before First Frame Update
     /// </summary>
     void Start()
     {
+        possession = GameObject.FindGameObjectWithTag("Player").GetComponent<HostPossession>();
         animator = GetComponent<Animator>();
     }
 
@@ -51,6 +63,20 @@ public class EnemyAssassination : MonoBehaviour
     /// </summary>
     void Update()
     {
+        if (!GameObject.ReferenceEquals(possession.enemy, gameObject))
+        {
+            if (lastTarget != null)
+            {
+                lastTarget.transform
+                    .Find("Canvas/AssassinationIndicator")
+                    .GetComponent<Image>()
+                    .enabled = false;
+                lastTarget = null;
+            }
+
+            return;
+        }
+
         // If Is Currently Assassinating...
         if (isAssassinating)
         {
@@ -62,6 +88,8 @@ public class EnemyAssassination : MonoBehaviour
                 Time.deltaTime * 5,
                 0.0f
             );
+
+            newDirection.y = 0;
 
             target.transform.rotation = Quaternion.LookRotation(newDirection);
 
@@ -82,6 +110,7 @@ public class EnemyAssassination : MonoBehaviour
                 if (isAnimating)
                 {
                     GetComponent<Movement>().enabled = true;
+
                     hasSyringe = false;
                     isAssassinating = false;
 
@@ -114,19 +143,37 @@ public class EnemyAssassination : MonoBehaviour
                 }
             }
 
-            // If Player Presses R
-            if (Input.GetKeyDown(KeyCode.R) && target != null)
+            if (lastTarget != null && !GameObject.ReferenceEquals(target, lastTarget))
             {
-                GetComponent<Movement>().enabled = false;
+                lastTarget.transform
+                    .Find("Canvas/AssassinationIndicator")
+                    .GetComponent<Image>()
+                    .enabled = false;
+            }
 
-                target.GetComponent<EnemySuspicion>().enabled = false;
-                target.GetComponent<NavMeshAgent>().enabled = false;
-                target.GetComponent<Rigidbody>().useGravity = false;
-                target.GetComponent<CapsuleCollider>().enabled = false;
+            if (target != null)
+            {
+                target.transform
+                    .Find("Canvas/AssassinationIndicator")
+                    .GetComponent<Image>()
+                    .enabled = true;
 
-                StartCoroutine(PlayAssassinationAnimation(1f));
+                lastTarget = target;
 
-                isAssassinating = true;
+                // If Player Presses R
+                if (Input.GetKeyDown(KeyCode.R))
+                {
+                    GetComponent<Movement>().enabled = false;
+
+                    target.GetComponent<EnemySuspicion>().enabled = false;
+                    target.GetComponent<NavMeshAgent>().enabled = false;
+                    target.GetComponent<Rigidbody>().useGravity = false;
+                    target.GetComponent<CapsuleCollider>().enabled = false;
+
+                    StartCoroutine(PlayAssassinationAnimation(1f));
+
+                    isAssassinating = true;
+                }
             }
         }
     }

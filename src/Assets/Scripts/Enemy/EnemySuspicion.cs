@@ -40,6 +40,16 @@ public class EnemySuspicion : MonoBehaviour
     /// </summary>
     private NavMeshAgent agent;
 
+    /// <summary>
+    /// Reference to Nearby Dead Enemy
+    /// </summary>
+    private GameObject deadEnemy;
+
+    /// <summary>
+    /// Range to Check for Dead Enemies
+    /// </summary>
+    private float enemyCheckRange = 5f;
+
     [Header("Detection Values")]
     /// <summary>
     /// Maximum Detection Angle
@@ -254,7 +264,7 @@ public class EnemySuspicion : MonoBehaviour
                             if (!agent.pathPending && agent.remainingDistance < 0.5f)
                             {
                                 // TODO: Losing Behaviour
-                                Debug.Log("You Lost...");
+                                GameManager.Instance.LoseGame();
                             }
                         }
                         // Else Enemy Isn't Going to Exit...
@@ -279,7 +289,7 @@ public class EnemySuspicion : MonoBehaviour
                 // If Player Is visible
                 if (IsPlayerVisible)
                 {
-                    if (IsCloseEnough(player.transform, 5))
+                    if (IsCloseEnough(player.transform, 8))
                     {
                         agent.isStopped = true;
                         LookAtPlayer();
@@ -385,6 +395,33 @@ public class EnemySuspicion : MonoBehaviour
                     playerLastLocationCoroutine = null;
                 }
             }
+            else if (DeadEnemyVisible())
+            {
+                if (IsCloseEnough(deadEnemy.transform, 5))
+                {
+                    agent.isStopped = true;
+                    LookAtDeadEnemy();
+                }
+                else
+                {
+                    agent.isStopped = false;
+                    agent.destination = deadEnemy.transform.position;
+                }
+
+                if (IncrementCounter(ref alertedCounter, AlertedThreshold, Time.deltaTime))
+                {
+                    agent.isStopped = false;
+                    suspicion = Suspicion.Alerted;
+                    agent.speed = 5;
+
+                    // If Enemy Is Scientist
+                    if (enemyType == EnemyType.Scientist)
+                    {
+                        agent.destination = FindClosestTerminal().transform.position;
+                        lastPlayerPosition = deadEnemy.transform.position;
+                    }
+                }
+            }
             // If Player Isn't Visible...
             else
             {
@@ -432,11 +469,28 @@ public class EnemySuspicion : MonoBehaviour
                 if (IncrementCounter(ref curiousCounter, CuriousThreshold, Time.deltaTime))
                 {
                     suspicion = Suspicion.Curious;
-                    agent.destination = FindClosestTerminal().transform.position;
                 }
 
                 // Look at Player
                 LookAtPlayer();
+            }
+            else if (DeadEnemyVisible())
+            {
+                if (IsCloseEnough(deadEnemy.transform, 5))
+                {
+                    agent.isStopped = true;
+                    LookAtDeadEnemy();
+                }
+                else
+                {
+                    agent.isStopped = false;
+                    agent.destination = deadEnemy.transform.position;
+                }
+
+                if (IncrementCounter(ref curiousCounter, CuriousThreshold, Time.deltaTime))
+                {
+                    suspicion = Suspicion.Curious;
+                }
             }
             else
             {
@@ -495,15 +549,19 @@ public class EnemySuspicion : MonoBehaviour
         Vector3 eyeSight = (transform.position + transform.forward + transform.up * 3);
 
         // Compare Distance Between Player and Enemy
-        Vector3 playerToTurret = player.transform.position - eyeSight;
+        Vector3 eyesightToTurret = player.transform.position - eyeSight;
+
+        Vector3 playerToTurret =
+            player.transform.position - (transform.position + transform.forward);
 
         // If Distance Is Smaller Than Threshold...
-        if (playerToTurret.magnitude > maxDistance)
+        if (eyesightToTurret.magnitude > maxDistance)
         {
             return false;
         }
 
         // Normalize Vector Between Player and Enemy
+        Vector3 normEyesightToTurret = Vector3.Normalize(eyesightToTurret);
         Vector3 normPlayerToTurret = Vector3.Normalize(playerToTurret);
 
         // Extract Angle Between Enemy Forward Vector and Vector Between Enemy and Player
@@ -516,13 +574,63 @@ public class EnemySuspicion : MonoBehaviour
         {
             // Send Raycast to Player
             RaycastHit hit;
-            Ray ray = new Ray(eyeSight, normPlayerToTurret);
+            Ray ray = new Ray(eyeSight, normEyesightToTurret);
 
             // If Raycast Hits Player...
             if (Physics.Raycast(ray, out hit, maxDistance, ~LayerMask.GetMask("Ignore Raycast")))
             {
                 if (hit.collider.tag == "Player")
                 {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Check If A Dead Enemy Is Visible
+    /// </summary>
+    /// <returns></returns>
+    public bool DeadEnemyVisible()
+    {
+        // Get Enemies Within Range
+        Collider[] hitColliders = Physics.OverlapSphere(
+            transform.position,
+            enemyCheckRange,
+            LayerMask.GetMask("Dead")
+        );
+
+        Debug.Log(hitColliders.Length);
+
+        bool deadEnemyNearby = false;
+        GameObject enemy = null;
+
+        for (int i = 0; i < hitColliders.Length; i++)
+        {
+            var health = hitColliders[i].GetComponentInParent<EnemyHealth>().Health;
+
+            if (health < 1)
+            {
+                deadEnemyNearby = true;
+                enemy = hitColliders[i].gameObject;
+                break;
+            }
+        }
+
+        if (deadEnemyNearby)
+        {
+            // Send Raycast to Player
+            RaycastHit hit;
+            Ray ray = new Ray(transform.position, enemy.transform.position - transform.position);
+
+            // If Raycast Hits Player...
+            if (Physics.Raycast(ray, out hit, maxDistance, ~LayerMask.GetMask("Ignore Raycast")))
+            {
+                if (hit.collider.gameObject.layer != LayerMask.GetMask("Environment"))
+                {
+                    deadEnemy = enemy;
                     return true;
                 }
             }
@@ -772,6 +880,18 @@ public class EnemySuspicion : MonoBehaviour
     {
         Quaternion rotation = Quaternion.LookRotation(
             player.transform.position - transform.position
+        );
+
+        transform.rotation = Quaternion.Lerp(transform.rotation, rotation, Time.deltaTime * 3);
+    }
+
+    /// <summary>
+    /// To Make Enemy Look At Player
+    /// </summary>
+    private void LookAtDeadEnemy()
+    {
+        Quaternion rotation = Quaternion.LookRotation(
+            deadEnemy.transform.position - transform.position
         );
 
         transform.rotation = Quaternion.Lerp(transform.rotation, rotation, Time.deltaTime * 3);

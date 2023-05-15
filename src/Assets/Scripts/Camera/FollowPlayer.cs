@@ -105,7 +105,7 @@ public class FollowPlayer : MonoBehaviour
     /// </summary>
     public CameraVerticalAngles VerticalAngles { get; private set; }
 
-     private PauseMenu pauseMenu;
+    private PauseMenu pauseMenu;
     private bool isPaused = false;
 
     /// <summary>
@@ -113,8 +113,7 @@ public class FollowPlayer : MonoBehaviour
     /// </summary>
     void Start()
     {
-
-         pauseMenu = FindObjectOfType<PauseMenu>();
+        pauseMenu = FindObjectOfType<PauseMenu>();
 
         // Get References
         player = GameObject.FindGameObjectWithTag("Player");
@@ -137,14 +136,11 @@ public class FollowPlayer : MonoBehaviour
     /// </summary>
     private void LateUpdate()
     {
+        if (isPaused)
+        {
+            return; // Don't update camera position or rotation
+        }
 
-            if (isPaused)
-    {
-        
-        return; // Don't update camera position or rotation
-    }
-
-    
         Vector3 playerToCamera = (transform.position - player.transform.position).normalized;
         Vector3 playerToCameraWithoutY = transform.position - player.transform.position;
         playerToCameraWithoutY.y = 0;
@@ -167,7 +163,7 @@ public class FollowPlayer : MonoBehaviour
         RaycastHit hit;
 
         // If Raycast Hits Something...
-        if (Physics.Raycast(ray, out hit, maxDistance, collisionLayer))
+        if (Physics.Raycast(ray, out hit, maxDistance, LayerMask.GetMask("Environment")))
         {
             transform.position = hit.point + hit.normal * 0.6f;
         }
@@ -230,8 +226,7 @@ public class FollowPlayer : MonoBehaviour
         transform.rotation = lookRotation;
 
         transform.position += (transform.rotation * AimOffset * aimOffsetLerp);
-        }
-    
+    }
 
     /// <summary>
     /// Zoom Camera In
@@ -289,7 +284,7 @@ public class FollowPlayer : MonoBehaviour
         }
     }
 
-     public void SetPaused(bool value)
+    public void SetPaused(bool value)
     {
         isPaused = value;
     }
