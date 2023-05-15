@@ -7,6 +7,7 @@ public class LoadScenes : MonoBehaviour
 {
     string currentSceneName;
     int lastSceneIndex;
+    PauseMenu pauseMenu;
 
     void Start()
     {
@@ -28,11 +29,11 @@ public class LoadScenes : MonoBehaviour
 
     public void Back()
     {
-        
-      string lastSceneName = PlayerPrefs.GetString("lastSceneName");
+       
+    string lastSceneName = PlayerPrefs.GetString("lastSceneName");
     SceneManager.LoadScene(lastSceneName);
-    }
 
+    }
     public void LoadOptions()
     {
         SceneManager.LoadScene("Options");

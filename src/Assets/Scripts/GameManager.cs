@@ -105,6 +105,9 @@ public class GameManager : MonoBehaviour
   
   PauseMenu pause;
 
+  string lastSceneName;
+  int loopCheck;
+
     /// <summary>
     /// Called When Script Instance Is Loaded
     /// </summary>
@@ -137,6 +140,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     void Start()
     {
+        loopCheck = 0;
         pause = GetComponent<PauseMenu>();
         Time.timeScale = 1f;
         if (SceneManager.GetActiveScene().name != "MainMenu")
@@ -151,6 +155,9 @@ public class GameManager : MonoBehaviour
             syringeIcon = GameObject.Find("SyringeIcon");
             keycardIcon = GameObject.Find("KeycardIcon");
         }
+
+         lastSceneName= PlayerPrefs.GetString("lastSceneName");
+        
     }
 
     /// <summary>
@@ -159,6 +166,10 @@ public class GameManager : MonoBehaviour
     void Update()
     {
 
+    if(lastSceneName == "Options" && lastSceneName!= "MainMenu" && loopCheck == 0){
+                pause.TogglePause();
+                loopCheck++;
+            }
     GUI.SetActive(true);
            
         if (hostHealth && hostHealth.Health > 0)
@@ -237,4 +248,11 @@ public class GameManager : MonoBehaviour
     {
         brainPowerSlider.value += value;
     }
+
+    private void OnDestroy()
+{
+    // Save the name of the current scene before switching to the next scene
+    string currentSceneName = SceneManager.GetActiveScene().name;
+    PlayerPrefs.SetString("lastSceneName", currentSceneName);
+}
 }

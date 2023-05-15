@@ -6,6 +6,7 @@ public class MainMusic : MonoBehaviour
     public AudioClip musicClip;
     private AudioSource musicSource;
      int lastSceneIndex;
+     string currentSceneName;
      
      string scene;
     
@@ -15,6 +16,7 @@ public class MainMusic : MonoBehaviour
         DontDestroyOnLoad(this.gameObject);
          lastSceneIndex = PlayerPrefs.GetInt("lastSceneIndex");
          scene = SceneManager.GetSceneByBuildIndex(lastSceneIndex).name;
+          currentSceneName = SceneManager.GetActiveScene().name;
         
     }
 
@@ -28,7 +30,7 @@ public class MainMusic : MonoBehaviour
     void Update() {
  
     // Check if the current scene is the specific scene you want to continue playing the audio in
-    if (scene == "MainMenu") {
+    if (scene == "MainMenu" || currentSceneName == "MainMenu") {
       
         // Check if the audio is not already playing
         if (!GetComponent<AudioSource>().isPlaying) {

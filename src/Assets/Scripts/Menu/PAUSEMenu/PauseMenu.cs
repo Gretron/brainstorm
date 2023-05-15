@@ -48,10 +48,6 @@ public class PauseMenu : MonoBehaviour
         }
     }
 
-    public void Resume()
-    {
-        TogglePause();
-    }
 
     // private void OnDisable()
     // {
