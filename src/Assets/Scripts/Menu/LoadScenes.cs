@@ -36,7 +36,10 @@ public class LoadScenes : MonoBehaviour
     }
     public void LoadOptions()
     {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
         SceneManager.LoadScene("Options");
+        
     }
 
 
@@ -47,6 +50,8 @@ public class LoadScenes : MonoBehaviour
 
      public void MainMenu()
     {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
        SceneManager.LoadScene("MainMenu");
     }
 
