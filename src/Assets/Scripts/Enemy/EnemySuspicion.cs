@@ -356,7 +356,7 @@ public class EnemySuspicion : MonoBehaviour
             // If Player Is Visible...
             if (PlayerVisible())
             {
-                if (IsCloseEnough(player.transform, 5))
+                if (IsCloseEnough(player.transform, 8))
                 {
                     agent.isStopped = true;
                     LookAtPlayer();
