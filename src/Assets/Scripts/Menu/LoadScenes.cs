@@ -36,8 +36,7 @@ public class LoadScenes : MonoBehaviour
     }
     public void LoadOptions()
     {
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
+
         SceneManager.LoadScene("Options");
         
     }
