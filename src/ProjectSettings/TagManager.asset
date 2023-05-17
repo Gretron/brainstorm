@@ -18,6 +18,8 @@ TagManager:
   - HoverQuitLose
   - HoverResume
   - Enemy
+  - Hover Image
+  - QuitImage
   layers:
   - Default
   - TransparentFX

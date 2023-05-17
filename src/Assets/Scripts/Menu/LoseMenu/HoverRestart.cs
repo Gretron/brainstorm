@@ -10,50 +10,40 @@ public class HoverRestart : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     public static bool isLocked;
 
     private Animator animator;
+    private QuitTrigger blockHover;
 
 
     private void Start()
     {
-       //animatorReference = GameObject.FindGameObjectWithTag("HoverStartGameExtended").GetComponent<Animator>();
-       
+  
        animator = GameObject.FindGameObjectWithTag("HoverRestart").GetComponent<Animator>();
+       blockHover = GameObject.FindGameObjectWithTag("Hover Image").GetComponent<QuitTrigger>();
+
 
     
     }
 
     public void OnPointerEnter(PointerEventData eventData)
-    {
-       // if (!isLocked)
-        //{
-          
+    {        
+            if(blockHover.Set()){
+                animator.SetBool("HoverRestart", true);
+            }
             
-            animator.SetBool("HoverRestart", true);
-        //}
+
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        //if (isLocked)
-        //{
+
       
             animator.SetBool("HoverRestart", false);
            
             
-        // }
-        // else{
-             
-        //      animatorReference.SetBool("Hover", false);
-             
-             
-        // }
     }
 
     public void OnButtonClick()
     {
-        //isLocked = false;
 
-       //animatorStart.SetBool("MainHover", true);
-     //animatorOptions.SetBool("Hover", true);
       
     }
 
